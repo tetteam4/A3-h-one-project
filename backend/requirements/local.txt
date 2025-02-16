@@ -1,0 +1,12 @@
+-r base.txt
+
+
+flake8
+black
+isort
+watchfiles
+
+pytest-django
+pytest-factoryboy
+Faker
+pytest-cov
