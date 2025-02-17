@@ -37,7 +37,7 @@ DJANGO_APPS = [
     "ckeditor",
 ]
 
-LOCAL_APPS = []
+LOCAL_APPS = ["apps.core", "apps.common"]
 
 THIRD_PARTY_APPS = [
     "rest_framework",
