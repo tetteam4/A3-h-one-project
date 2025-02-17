@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import DashboardPage from "./pages/DashboardPage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
 import PrivateRoute from "./components/common/PrivateRoute";
 import OnlyAdminPrivateRoute from "./components/common/OnlyAdmin";
 import ScrollTop from "./components/common/ScrollTop";
@@ -16,9 +16,9 @@ export default function App() {
           {/* <Route path="/sign-in" element={<Signin />} /> */}
           {/* <Route path="/sign-up" element={<Signup />} /> */}
           <Route path="/userprofile" element={<UserProfilePage />} />
-          <Route element={<PrivateRoute />}>
+          {/* <Route element={<PrivateRoute />}> */}
             <Route path="/dashboard" element={<DashboardPage />} />
-          </Route>
+          {/* </Route> */}
           <Route element={<OnlyAdminPrivateRoute />}></Route>
         </Routes>
         {/* <Footer /> */}
