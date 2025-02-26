@@ -1,35 +1,85 @@
 import { useState } from "react";
+import { SiWebmoney } from "react-icons/si";
+import {
+  FaTachometerAlt,
+  FaExchangeAlt,
+  FaUsers,
+  FaUserTie,
+  FaChartBar,
+  FaCog,
+  FaSignOutAlt,
+  FaBars,
+} from "react-icons/fa";
 
 const Sidebar = ({ setActiveComponent }) => {
-  const [activeC, setActiveC] = useState("dashboard");
+  const [selectedC, setSelectedC] = useState("home");
+  const [activeC, setActiveC] = useState("home");
+
   const Components = [
-    { name: "Dashboard", value: "dashboard" },
-    { name: "Transaction", value: "transaction" },
-    { name: "Customer", value: "customer" },
-    { name: "Agent", value: "agent" },
-    { name: "Report", value: "report" },
-    { name: "Settings", value: "setting" },
+    { name: "Home", value: "home", icon: <FaTachometerAlt /> },
+    { name: "Transaction", value: "transaction", icon: <FaExchangeAlt /> },
+    { name: "Customer", value: "customer", icon: <FaUsers /> },
+    { name: "Agent", value: "agent", icon: <FaUserTie /> },
+    { name: "Report", value: "report", icon: <FaChartBar /> },
+    { name: "Settings", value: "setting", icon: <FaCog /> },
+    { name: "Sign Out", value: "signout", icon: <FaSignOutAlt /> },
   ];
 
   return (
-    <div className="bg-gray-900 text-white w-64 h-screen p-4">
-      <h2 className="text-xl font-bold mb-4">Hawala System</h2>
-      <ul className="space-y-2">
+    <div
+      className={`fixed h-full transition-all duration-500 w-64 bg-[#2a2185] border-l-[10px] border-[#2a2185] overflow-y-auto `}
+    >
+      {/* Sidebar Header */}
+      <header className="flex items-center justify-between p-5 text-white font-bold text-xl">
+        <div className="flex items-center gap-x-3">
+          <SiWebmoney className="text-4xl" />
+          <span>Hawala</span>
+        </div>
+      </header>
+
+      {/* Sidebar Menu */}
+      <ul className="mt-6">
         {Components.map((component, index) => (
-          <li key={index}>
-            <button
+          <li key={index} className="relative group">
+            <a
               onClick={() => {
                 setActiveComponent(component.value);
+                setSelectedC(component.value);
                 setActiveC(component.value);
               }}
-              className={`${
-                activeC === component.value
-                  ? "bg-gray-700"
-                  : "hover:bg-gray-700"
-              }  block w-full text-left p-2 hover:bg-gray-700 rounded`}
+              onMouseEnter={() => setActiveC(component.value)}
+              onMouseLeave={() => setActiveC(selectedC)}
+              className={`relative flex items-center w-full px-6 py-3 transition-all duration-300 rounded-l-3xl 
+                ${
+                  activeC === component.value
+                    ? "bg-white text-black"
+                    : "hover:bg-white text-white"
+                }`}
             >
-              {component.name}
-            </button>
+              <span className="text-xl">{component.icon}</span>
+
+              <span className="ml-4 text-lg">{component.name}</span>
+
+              {/* Circle Effects */}
+              <span
+                className={`absolute right-0 -top-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_35px_0_10px_white] 
+                  transition-opacity duration-300 
+                  ${
+                    activeC === component.value
+                      ? "opacity-100"
+                      : "opacity-0 group-hover:opacity-100"
+                  }`}
+              ></span>
+              <span
+                className={`absolute right-0 -bottom-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_-35px_0_10px_white] 
+                  transition-opacity duration-300 
+                  ${
+                    activeC === component.value
+                      ? "opacity-100"
+                      : "opacity-0 group-hover:opacity-100"
+                  }`}
+              ></span>
+            </a>
           </li>
         ))}
       </ul>

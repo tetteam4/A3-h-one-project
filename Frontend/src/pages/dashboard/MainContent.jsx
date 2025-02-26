@@ -24,7 +24,7 @@ const MainContent = ({ activeComponent }) => {
     }
   };
 
-  return <div className=" p-4 min-h-screen">{renderContent()}</div>;
+  return <div className="min-h-screen">{renderContent()}</div>;
 };
 
 export default MainContent;
