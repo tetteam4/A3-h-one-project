@@ -27,13 +27,13 @@ const Sidebar = ({ setActiveComponent }) => {
 
   return (
     <div
-      className={`fixed h-full transition-all duration-500 w-64 bg-[#2a2185] border-l-[10px] border-[#2a2185] overflow-y-auto `}
+      className={`fixed h-full transition-all duration-500 w-64 bg-primary border-l-[10px] border-[#2a2185] overflow-y-auto `}
     >
       {/* Sidebar Header */}
       <header className="flex items-center justify-between p-5 text-white font-bold text-xl">
-        <div className="flex items-center gap-x-3">
+        <div className="flex items-center gap-x-4">
           <SiWebmoney className="text-4xl" />
-          <span>Hawala</span>
+          <span  className="text-2xl">Hawala</span>
         </div>
       </header>
 
@@ -52,13 +52,13 @@ const Sidebar = ({ setActiveComponent }) => {
               className={`relative flex items-center w-full px-6 py-3 transition-all duration-300 rounded-l-3xl 
                 ${
                   activeC === component.value
-                    ? "bg-white text-black"
+                    ? "bg-white text-primary"
                     : "hover:bg-white text-white"
                 }`}
             >
               <span className="text-xl">{component.icon}</span>
 
-              <span className="ml-4 text-lg">{component.name}</span>
+              <span className="ml-4 text-lg font-semibold">{component.name}</span>
 
               {/* Circle Effects */}
               <span
