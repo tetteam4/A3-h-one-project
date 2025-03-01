@@ -17,7 +17,8 @@ const Sidebar = ({ setActiveComponent }) => {
 
   const Components = [
     { name: "Home", value: "home", icon: <FaTachometerAlt /> },
-    { name: "Transaction", value: "transaction", icon: <FaExchangeAlt /> },
+    { name: "Send Money", value: "transaction", icon: <FaExchangeAlt /> },
+    { name: "Recive Money", value: "", icon: <FaExchangeAlt /> },
     { name: "Customer", value: "customer", icon: <FaUsers /> },
     { name: "Agent", value: "agent", icon: <FaUserTie /> },
     { name: "Report", value: "report", icon: <FaChartBar /> },
@@ -63,7 +64,7 @@ const Sidebar = ({ setActiveComponent }) => {
               {/* Circle Effects */}
               <span
                 className={`absolute right-0 -top-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_35px_0_10px_white] 
-                  transition-opacity duration-300 
+                  transition-opacity duration-100 
                   ${
                     activeC === component.value
                       ? "opacity-100"
@@ -72,7 +73,7 @@ const Sidebar = ({ setActiveComponent }) => {
               ></span>
               <span
                 className={`absolute right-0 -bottom-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_-35px_0_10px_white] 
-                  transition-opacity duration-300 
+                  transition-opacity duration-100 
                   ${
                     activeC === component.value
                       ? "opacity-100"

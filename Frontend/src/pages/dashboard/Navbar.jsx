@@ -37,14 +37,14 @@ const Navbar = () => {
 
       {/* Right: Icons & Profile */}
       <div className="flex items-center gap-6">
-        <FaBell className="text-xl cursor-pointer text-gray-600 hover:text-blue-600 transition duration-300" />
-        <MdOutlineMessage className="text-xl cursor-pointer text-gray-600 hover:text-blue-600 transition duration-300" />
+        <FaBell className="text-2xl cursor-pointer text-primary hover:text-primary transition duration-300" />
+        <MdOutlineMessage className="text-2xl cursor-pointer text-primary hover:text-primary transition duration-300" />
 
         {/* Profile */}
-        <div className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition duration-300">
-          <FaUserCircle className="text-2xl" />
+        <div className="flex items-center gap-2 cursor-pointer text-primary transition duration-300">
+          <FaUserCircle className="text-3xl" />
           <span className="text-sm font-medium hidden sm:block">
-            Mohammad Anwar
+            Mohammad 
           </span>
         </div>
       </div>
