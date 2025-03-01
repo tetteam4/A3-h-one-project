@@ -1,9 +1,9 @@
-import React from 'react'
-
+import React, { isValidElement } from "react";
+import { Button } from "@mui/material";
 function UserProfilePage() {
-  return (
-    <div>UserProfilePage</div>
-  )
+  return <div>
+    
+  </div>;
 }
 
-export default UserProfilePage
+export default UserProfilePage;
