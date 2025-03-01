@@ -34,10 +34,11 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.sites',
     "ckeditor",
 ]
 
-LOCAL_APPS = ["apps.core", "apps.common"]
+LOCAL_APPS = ["apps.core", "apps.common","apps.users"]
 
 THIRD_PARTY_APPS = [
     "rest_framework",
@@ -128,7 +129,7 @@ DATABASES = {
 }
 
 ADMIN_URL = "supersecret/"
-# AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "users.User"
 
 # Ensure you allow CORS for API routes
 # CORS_URLS_REGEX = "^api/.*$"
@@ -141,6 +142,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSIONS_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
+ACCOUNT_LOGIN_METHODS = {'email'}
 
 # JWT Authentication settings
 SIMPLE_JWT = {
