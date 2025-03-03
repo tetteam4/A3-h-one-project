@@ -1,10 +1,10 @@
 // frontend/src/pages/Signup.jsx
 import { motion } from "framer-motion";
-import Input from "../SignUp/Input";
+import Input from "../components/Input";
 import { Loader, Lock, Mail, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
-import useSignup from "../../hooks/useSignup";
+import useSignup from "../hooks/useSignup";
 
 const SignUpPage = () => {
   const {

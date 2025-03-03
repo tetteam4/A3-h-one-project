@@ -5,7 +5,7 @@ import PrivateRoute from "./components/common/PrivateRoute";
 import OnlyAdminPrivateRoute from "./components/common/OnlyAdmin";
 import ScrollTop from "./components/common/ScrollTop";
 import UserProfilePage from "./pages/UserProfilePage";
-// import Signup from './features/authentication/components/Signup'
+import Signup from './features/authentication/components/Signup'
 export default function App() {
   return (
     <div>
