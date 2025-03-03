@@ -59,9 +59,8 @@ const S_Transaction = () => {
       commission: "",
       amountToPay: "",
       agent: "",
-    });   
+    });
     console.log(formData);
-    
   };
 
   return (
@@ -130,7 +129,7 @@ const S_Transaction = () => {
       </form>
 
       {modalType && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center ">
           <div className="bg-white p-6 rounded shadow-md w-96">
             <h2 className="text-xl font-semibold mb-3">
               {modalType === "sender" ? "Sender Details" : "Receiver Details"}
@@ -191,6 +190,12 @@ const S_Transaction = () => {
               className="mt-4 p-2 bg-red-500 text-white rounded"
             >
               Close
+            </button>{" "}
+            <button
+              onClick={closeModal}
+              className="mt-4 p-2 bg-green-500 text-white rounded"
+            >
+              submit
             </button>
           </div>
         </div>

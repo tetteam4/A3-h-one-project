@@ -30,35 +30,6 @@ const R_Transaction = () => {
     agent: "",
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newTransaction = {
-      id: transactions.length + 1,
-      ...formData,
-      status: "Pending",
-      date: new Date().toISOString().split("T")[0],
-      currency: "AFN",
-      phone: "N/A",
-      fingerprint: "N/A",
-      printBill: true,
-      country: "Afghanistan",
-    };
-    setTransactions([...transactions, newTransaction]);
-    setFormData({
-      sender: "",
-      receiver: "",
-      amount: "",
-      commission: "",
-      amountToPay: "",
-      agent: "",
-    });
-  };
-
   const filteredTransactions =
     filter === "All"
       ? transactions
@@ -70,77 +41,6 @@ const R_Transaction = () => {
       <p className="text-gray-600 mb-6">
         View, manage, and track all Hawala transactions.
       </p>
-
-      {/* Form for New Transaction */}
-      <form
-        onSubmit={handleSubmit}
-        className="mb-6 bg-gray-100 p-4 rounded shadow"
-      >
-        <h2 className="text-xl font-semibold mb-3">Submit a New Transaction</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="sender"
-            placeholder="Sender"
-            value={formData.sender}
-            onChange={handleInputChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="receiver"
-            placeholder="Receiver"
-            value={formData.receiver}
-            onChange={handleInputChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            type="number"
-            name="amount"
-            placeholder="Amount"
-            value={formData.amount}
-            onChange={handleInputChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            type="number"
-            name="commission"
-            placeholder="Commission"
-            value={formData.commission}
-            onChange={handleInputChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            type="number"
-            name="amountToPay"
-            placeholder="Amount to Pay"
-            value={formData.amountToPay}
-            onChange={handleInputChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            type="text"
-            name="agent"
-            placeholder="Agent"
-            value={formData.agent}
-            onChange={handleInputChange}
-            className="p-2 border rounded"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="mt-4 p-2 bg-blue-500 text-white rounded"
-        >
-          Submit Transaction
-        </button>
-      </form>
-
       {/* Filters */}
       <div className="mb-4">
         <label className="font-semibold text-gray-700 mr-2">
@@ -157,7 +57,6 @@ const R_Transaction = () => {
           <option value="Failed">Failed</option>
         </select>
       </div>
-
       {/* Transaction Table */}
       <div className="bg-white shadow-md overflow-hidden">
         <table className="w-full table-fixed">

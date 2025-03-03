@@ -3,15 +3,42 @@ import { useState } from "react";
 const Customer = () => {
   // Initial customer data
   const [customers, setCustomers] = useState([
-    { id: 1, name: "Ahmad Sharifi", phone: "0791112233", verified: true },
-    { id: 2, name: "Zahra Habibi", phone: "0784445566", verified: false },
-    { id: 3, name: "Mohammad Amini", phone: "0779998877", verified: true },
+    {
+      id: 1,
+      name: "Ahmad Sharifi",
+      fatherName: "Sharif",
+      idNumber: "123456",
+      phoneNumber: "0791112233",
+      biometric: "Yes",
+      verified: true,
+    },
+    {
+      id: 2,
+      name: "Zahra Habibi",
+      fatherName: "Habib",
+      idNumber: "654321",
+      phoneNumber: "0784445566",
+      biometric: "No",
+      verified: false,
+    },
+    {
+      id: 3,
+      name: "Mohammad Amini",
+      fatherName: "Amin",
+      idNumber: "987654",
+      phoneNumber: "0779998877",
+      biometric: "Yes",
+      verified: true,
+    },
   ]);
 
   // New customer state
   const [newCustomer, setNewCustomer] = useState({
     name: "",
-    phone: "",
+    fatherName: "",
+    idNumber: "",
+    phoneNumber: "",
+    biometric: "",
     verified: false,
   });
 
@@ -26,9 +53,23 @@ const Customer = () => {
 
   // Add new customer
   const addCustomer = () => {
-    if (!newCustomer.name || !newCustomer.phone) return;
+    if (
+      !newCustomer.name ||
+      !newCustomer.fatherName ||
+      !newCustomer.idNumber ||
+      !newCustomer.phoneNumber ||
+      !newCustomer.biometric
+    )
+      return;
     setCustomers([...customers, { id: customers.length + 1, ...newCustomer }]);
-    setNewCustomer({ name: "", phone: "", verified: false });
+    setNewCustomer({
+      name: "",
+      fatherName: "",
+      idNumber: "",
+      phoneNumber: "",
+      biometric: "",
+      verified: false,
+    });
   };
 
   return (
@@ -44,7 +85,10 @@ const Customer = () => {
           <tr className="bg-gray-200">
             <th className="border p-2">ID</th>
             <th className="border p-2">Name</th>
-            <th className="border p-2">Phone</th>
+            <th className="border p-2">Father Name</th>
+            <th className="border p-2">ID Number</th>
+            <th className="border p-2">Phone Number</th>
+            <th className="border p-2">Biometric</th>
             <th className="border p-2">Verified</th>
           </tr>
         </thead>
@@ -53,7 +97,10 @@ const Customer = () => {
             <tr key={customer.id} className="text-center">
               <td className="border p-2">{customer.id}</td>
               <td className="border p-2">{customer.name}</td>
-              <td className="border p-2">{customer.phone}</td>
+              <td className="border p-2">{customer.fatherName}</td>
+              <td className="border p-2">{customer.idNumber}</td>
+              <td className="border p-2">{customer.phoneNumber}</td>
+              <td className="border p-2">{customer.biometric}</td>
               <td className="border p-2">{customer.verified ? "✅" : "❌"}</td>
             </tr>
           ))}
@@ -61,22 +108,46 @@ const Customer = () => {
       </table>
 
       {/* Form to add a new customer */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <input
           type="text"
           name="name"
           placeholder="Customer Name"
           value={newCustomer.name}
           onChange={handleChange}
-          className="border p-2 rounded w-1/3"
+          className="border p-2 rounded w-1/5"
         />
         <input
           type="text"
-          name="phone"
-          placeholder="Phone"
-          value={newCustomer.phone}
+          name="fatherName"
+          placeholder="Father Name"
+          value={newCustomer.fatherName}
           onChange={handleChange}
-          className="border p-2 rounded w-1/3"
+          className="border p-2 rounded w-1/5"
+        />
+        <input
+          type="text"
+          name="idNumber"
+          placeholder="ID Number"
+          value={newCustomer.idNumber}
+          onChange={handleChange}
+          className="border p-2 rounded w-1/5"
+        />
+        <input
+          type="text"
+          name="phoneNumber"
+          placeholder="Phone Number"
+          value={newCustomer.phoneNumber}
+          onChange={handleChange}
+          className="border p-2 rounded w-1/5"
+        />
+        <input
+          type="text"
+          name="biometric"
+          placeholder="Biometric Data"
+          value={newCustomer.biometric}
+          onChange={handleChange}
+          className="border p-2 rounded w-1/5"
         />
         <label className="flex items-center space-x-2">
           <input
