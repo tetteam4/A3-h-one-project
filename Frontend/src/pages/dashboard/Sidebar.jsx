@@ -17,8 +17,8 @@ const Sidebar = ({ setActiveComponent }) => {
 
   const Components = [
     { name: "Home", value: "home", icon: <FaTachometerAlt /> },
-    { name: "Send Money", value: "transaction", icon: <FaExchangeAlt /> },
-    { name: "Recive Money", value: "", icon: <FaExchangeAlt /> },
+    { name: "Send Money", value: "S_transactions", icon: <FaExchangeAlt /> },
+    { name: "Receive Money", value: "R_transactions", icon: <FaExchangeAlt /> },
     { name: "Customer", value: "customer", icon: <FaUsers /> },
     { name: "Agent", value: "agent", icon: <FaUserTie /> },
     { name: "Report", value: "report", icon: <FaChartBar /> },
@@ -34,7 +34,7 @@ const Sidebar = ({ setActiveComponent }) => {
       <header className="flex items-center justify-between p-5 text-white font-bold text-xl">
         <div className="flex items-center gap-x-4">
           <SiWebmoney className="text-4xl" />
-          <span  className="text-2xl">Hawala</span>
+          <span className="text-2xl">Hawala</span>
         </div>
       </header>
 
@@ -59,7 +59,9 @@ const Sidebar = ({ setActiveComponent }) => {
             >
               <span className="text-xl">{component.icon}</span>
 
-              <span className="ml-4 text-lg font-semibold">{component.name}</span>
+              <span className="ml-4 text-lg font-semibold">
+                {component.name}
+              </span>
 
               {/* Circle Effects */}
               <span
