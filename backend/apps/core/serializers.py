@@ -14,7 +14,7 @@ class BranchSerializer(serializers.ModelSerializer):
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['id', 'name', 'father_name', 'id_card', 'biometric']
+        fields = ['id', 'name', 'father_name', "phone_number", 'id_card', 'biometric']
 
 class TransactionsSerializer(serializers.ModelSerializer):
     branch_method = serializers.SerializerMethodField()
