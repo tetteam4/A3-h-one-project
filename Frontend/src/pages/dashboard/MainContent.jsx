@@ -1,16 +1,19 @@
 import Agent from "./pages/agent";
 import Customer from "./pages/customers";
 import Dashboard from "./pages/dashboard";
-import Transaction from "./pages/transactions";
+import S_Transaction from "./pages/S_transactions";
 import Report from "./pages/reports";
 import Setting from "./pages/setting";
+import R_Transaction from "./pages/R_transactions";
 const MainContent = ({ activeComponent }) => {
   const renderContent = () => {
     switch (activeComponent) {
       case "dashboard":
         return <Dashboard />;
-      case "transaction":
-        return <Transaction />;
+      case "S_transactions":
+        return <S_Transaction />;
+      case "R_transactions":
+        return <R_Transaction />;
       case "customer":
         return <Customer />;
       case "agent":
