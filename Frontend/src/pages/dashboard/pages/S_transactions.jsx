@@ -17,6 +17,9 @@ const S_Transaction = () => {
   const openModal = (type) => setModalType(type);
   const closeModal = () => {
     setModalType(null);
+    // setFormData((prev) => {
+    //   ...prev
+    // })
   };
 
   const handleChange = (e, section) => {
@@ -62,6 +65,22 @@ const S_Transaction = () => {
     });
     console.log(formData);
   };
+  const handleResetModel = (modelType) => {
+    setFormData((prevData) => {
+      if (modelType === "sender") {
+        return {
+          ...prevData,
+          sender: { name: "", fatherName: "", phoneNumber: "" },
+        };
+      } else if (modelType === "receiver") {
+        return {
+          ...prevData,
+          receiver: { name: "", fatherName: "", idNumber: "", biometric: "" },
+        };
+      }
+      return prevData;
+    });
+  };
 
   return (
     <div className="p-6 bg-white min-h-screen">
@@ -74,14 +93,14 @@ const S_Transaction = () => {
             onClick={() => openModal("sender")}
             className="p-2 border rounded bg-blue-100"
           >
-            Sender Details
+            Sender
           </button>
           <button
             type="button"
             onClick={() => openModal("receiver")}
             className="p-2 border rounded bg-blue-100"
           >
-            Receiver Details
+            Receiver
           </button>
           <input
             type="number"
@@ -186,7 +205,10 @@ const S_Transaction = () => {
               />
             )}
             <button
-              onClick={closeModal}
+              onClick={() => {
+                closeModal();
+                handleResetModel(modalType);
+              }}
               className="mt-4 p-2 bg-red-500 text-white rounded"
             >
               Close
