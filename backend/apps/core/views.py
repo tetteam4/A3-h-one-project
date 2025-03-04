@@ -1,6 +1,6 @@
 
-from .models import Branch, Transactions
-from .serializers import BranchSerializer, TransactionsSerializer
+from .models import Branch, Customer, Transactions
+from .serializers import BranchSerializer, CustomerSerializer, TransactionsSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 class BranchViewSet(viewsets.ModelViewSet):
     queryset = Branch.objects.all()
     serializer_class = BranchSerializer
-
 
 
 
@@ -52,3 +51,9 @@ class TransactionsViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         logger.info(f"Attempting to delete transaction with id: {kwargs['id']}")
         return super().destroy(request, *args, **kwargs)
+    
+
+class CustomerViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer  
+    lookup_field = 'id'

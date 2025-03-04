@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Branch, Transactions
+from .models import Branch, Customer, Transactions
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -52,3 +52,10 @@ class TransactionsSerializer(serializers.ModelSerializer):
             validated_data['amount_pay'] = validated_data['amount'] - validated_data['fee']
         
         return super().update(instance, validated_data)
+    
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ['id', 'name', 'father_name', 'id_card', 'biometric']
