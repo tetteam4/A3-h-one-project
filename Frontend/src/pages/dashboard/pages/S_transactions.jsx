@@ -1,11 +1,25 @@
 import { useState } from "react";
+import axios, { Axios } from "axios";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const S_Transaction = () => {
   const [transactions, setTransactions] = useState([]);
   const [filter, setFilter] = useState("All");
   const [formData, setFormData] = useState({
-    sender: { name: "", fatherName: "", phoneNumber: "" },
-    receiver: { name: "", fatherName: "", idNumber: "", biometric: "" },
+    sender: {
+      name: "",
+      fatherName: "",
+      phoneNumber: "",
+      idNumber: "",
+      biometric: "",
+    },
+    receiver: {
+      name: "",
+      fatherName: "",
+      phoneNumber: "",
+      idNumber: "",
+      biometric: "",
+    },
     amount: "",
     commission: "",
     amountToPay: "",
@@ -46,25 +60,49 @@ const S_Transaction = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newTransaction = {
-      id: transactions.length + 1,
-      ...formData,
-      status: "Pending",
-      date: new Date().toISOString().split("T")[0],
-    };
-    setTransactions([...transactions, newTransaction]);
-    setFormData({
-      sender: { name: "", fatherName: "", phoneNumber: "" },
-      receiver: { name: "", fatherName: "", idNumber: "", biometric: "" },
-      amount: "",
-      commission: "",
-      amountToPay: "",
-      agent: "",
-    });
-    console.log(formData);
+
+    try {
+      // Send sender data to API
+      const senderData = {
+        name: formData.sender.name,
+        father_name: formData.sender.fatherName,
+        phone_number: formData.sender.phoneNumber,
+        id_card: formData.sender.idNumber || null,
+        biometric: formData.sender.biometric || false,
+      };
+
+      const receiverData = {
+        name: formData.receiver.name,
+        father_name: formData.receiver.fatherName,
+        phone_number: formData.receiver.phoneNumber,
+        id_card: formData.receiver.idNumber || null,
+        biometric: formData.receiver.biometric || false,
+      };
+      const resSender = await axios.post(
+        `${BASE_URL}/api/customers/`,
+        senderData
+      );
+      const resReceiver = await axios.post(
+        `${BASE_URL}/api/customers/`,
+        receiverData
+      );
+      
+      // Reset form data
+      setFormData({
+        sender: { name: "", fatherName: "", phoneNumber: "" },
+        receiver: { name: "", fatherName: "", idNumber: "", biometric: "" },
+        amount: "",
+        commission: "",
+        amountToPay: "",
+        agent: "",
+      });
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
   };
+
   const handleResetModel = (modelType) => {
     setFormData((prevData) => {
       if (modelType === "sender") {
@@ -148,7 +186,7 @@ const S_Transaction = () => {
       </form>
 
       {modalType && (
-        <div className="fixed inset-0 flex items-center justify-center ">
+        <div className="fixed inset-0 flex items-center justify-center">
           <div className="bg-white p-6 rounded shadow-md w-96">
             <h2 className="text-xl font-semibold mb-3">
               {modalType === "sender" ? "Sender Details" : "Receiver Details"}
@@ -171,39 +209,31 @@ const S_Transaction = () => {
               className="p-2 border rounded w-full mb-2"
               required
             />
-            {modalType === "receiver" && (
-              <>
-                <input
-                  type="text"
-                  name="idNumber"
-                  placeholder="ID Number"
-                  value={formData.receiver.idNumber}
-                  onChange={(e) => handleChange(e, "receiver")}
-                  className="p-2 border rounded w-full mb-2"
-                  required
-                />
-                <input
-                  type="text"
-                  name="biometric"
-                  placeholder="Biometric Data"
-                  value={formData.receiver.biometric}
-                  onChange={(e) => handleChange(e, "receiver")}
-                  className="p-2 border rounded w-full mb-2"
-                  required
-                />
-              </>
-            )}
-            {modalType === "sender" && (
-              <input
-                type="text"
-                name="phoneNumber"
-                placeholder="Phone Number"
-                value={formData.sender.phoneNumber}
-                onChange={(e) => handleChange(e, "sender")}
-                className="p-2 border rounded w-full mb-2"
-                required
-              />
-            )}
+            <input
+              type="text"
+              name="idNumber"
+              placeholder="ID Number"
+              value={formData[modalType].idNumber}
+              onChange={(e) => handleChange(e, modalType)}
+              className="p-2 border rounded w-full mb-2"
+            />
+            <input
+              type="text"
+              name="biometric"
+              placeholder="Biometric Data"
+              value={formData[modalType].biometric}
+              onChange={(e) => handleChange(e, modalType)}
+              className="p-2 border rounded w-full mb-2"
+            />
+            <input
+              type="text"
+              name="phoneNumber"
+              placeholder="Phone Number"
+              value={formData[modalType].phoneNumber}
+              onChange={(e) => handleChange(e, modalType)}
+              className="p-2 border rounded w-full mb-2"
+              required
+            />
             <button
               onClick={() => {
                 closeModal();
@@ -212,12 +242,12 @@ const S_Transaction = () => {
               className="mt-4 p-2 bg-red-500 text-white rounded"
             >
               Close
-            </button>{" "}
+            </button>
             <button
               onClick={closeModal}
               className="mt-4 p-2 bg-green-500 text-white rounded"
             >
-              submit
+              Submit
             </button>
           </div>
         </div>
