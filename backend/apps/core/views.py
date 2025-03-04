@@ -26,10 +26,10 @@ class BranchViewSet(viewsets.ModelViewSet):
 
 
 class TransactionsViewSet(viewsets.ModelViewSet):
-    queryset = Transactions.objects.all()  # Specify the queryset to use for this viewset
-    serializer_class = TransactionsSerializer  # Specify the serializer for transactions
+    queryset = Transactions.objects.all()  
+    serializer_class = TransactionsSerializer #
     lookup_field = 'id'
-    # Optional: Customizing the 'create' method if needed
+    
     def create(self, request, *args, **kwargs):
         # You can perform additional validation or processing before creating
         serializer = self.get_serializer(data=request.data)
