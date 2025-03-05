@@ -19,16 +19,22 @@ class Branch(models.Model):
         related_name="managers",
     )
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return f"{self.name}: {self.location}"
 
 
-class Customer(TimeStampedUUIDModel):
+class Customer(models.Model):
     name = models.CharField(max_length=255)
     father_name = models.CharField(max_length=255)
     id_card = models.PositiveSmallIntegerField(max_length=50)
     biometric = models.BooleanField(default=True)
     phone_number = PhoneNumberField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} {self.father_name}"
