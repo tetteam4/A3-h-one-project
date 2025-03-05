@@ -1,47 +1,42 @@
-from profile import Profile
-
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, first_name, last_name, email, password=None):
+    def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         if not email:
-            raise ValueError("User must have an email address!")
-
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
         user = self.model(
-            email=self.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name,
+            email=email, first_name=first_name, last_name=last_name, **extra_fields
         )
         user.set_password(password)
-        user.save()
-        return user
-
-    def create_superuser(self, first_name, last_name, email, password=None):
-        user = self.create_user(
-            first_name=first_name,
-            last_name=last_name,
-            email=self.normalize_email(email),
-            password=password,
-        )
-        user.is_admin = True
-        user.is_active = True
-        user.is_staff = True
-        user.is_superadmin = True
         user.save(using=self._db)
         return user
+
+    def create_superuser(
+        self, email, first_name, last_name, password=None, **extra_fields
+    ):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("is_superadmin", True)
+
+        return self.create_user(email, first_name, last_name, password, **extra_fields)
 
 
 class User(AbstractBaseUser):
     Admin = 0
     Branch_admin = 1
     agent = 2
+
     ROLE_CHOICES = (
         (Admin, "Admin"),
         (Branch_admin, "Branch admin"),
         (agent, "Agent"),
     )
+
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
@@ -49,6 +44,11 @@ class User(AbstractBaseUser):
     otp = models.CharField(max_length=8, blank=True, null=True)
     refresh_token = models.CharField(max_length=1000, blank=True, null=True)
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
+
+    branch = models.ForeignKey(
+        "core.Branch", on_delete=models.PROTECT, null=True, blank=True
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_admin = models.BooleanField(default=False)
