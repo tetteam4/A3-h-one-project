@@ -78,7 +78,7 @@ class UserSerializer(serializers.ModelSerializer):
         # Ensure branch_id is provided
         branch_instance = validated_data.get("branch")
         if branch_instance:
-            validated_data["branch"] = branch_instance.id
+            validated_data["branch"] = branch_instance
 
         return super().create(validated_data)
 

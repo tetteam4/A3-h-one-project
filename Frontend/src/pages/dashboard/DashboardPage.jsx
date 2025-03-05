@@ -5,7 +5,6 @@ import MainContent from "./MainContent";
 
 const Dashboard = () => {
   const [activeComponent, setActiveComponent] = useState(null);
-
   return (
     <div className="flex h-screen w-full overflow-hidden">
       {/* Sidebar - Fixed Position */}

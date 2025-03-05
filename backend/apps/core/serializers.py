@@ -55,7 +55,7 @@ class TransactionsSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-    def get_branch_method(self, obj):
+    def get_branch_name(self, obj):
         return obj.branch.name if obj.branch else None
 
     def validate(self, data):

@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios, { Axios } from "axios";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const S_Transaction = () => {
   const [transactions, setTransactions] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [branches, setBranches] = useState([]);
   const [formData, setFormData] = useState({
     sender: {
       name: "",
       fatherName: "",
       phoneNumber: "",
+      branch: "",
       idNumber: "",
       biometric: "",
     },
@@ -38,6 +40,7 @@ const S_Transaction = () => {
 
   const handleChange = (e, section) => {
     const { name, value } = e.target;
+
     if (
       section === "amount" ||
       section === "commission" ||
@@ -52,6 +55,12 @@ const S_Transaction = () => {
             ? prev.amount - prev.commission
             : prev.amountToPay,
       }));
+    } else if (section === "branch") {
+      // Update branch separately
+      setFormData((prev) => ({
+        ...prev,
+        branch: value, // Set branch directly
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -59,6 +68,20 @@ const S_Transaction = () => {
       }));
     }
   };
+
+  const fetchBranches = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/api/branches/"
+      );
+      setBranches(response.data);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+    }
+  };
+  useEffect(() => {
+    fetchBranches();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,12 +123,12 @@ const S_Transaction = () => {
 
       // Prepare transaction data
       const transactionData = {
-        branch: null,
+        branch: formData.branch,
         sender: senderId,
         receiver: receiverId,
         amount: formData.amount || null,
         fee: formData.commission || null,
-        status: "pending", // You can change this based on your logic
+        status: "Complete", // You can change this based on your logic
       };
 
       // Send transaction data to API
@@ -199,15 +222,19 @@ const S_Transaction = () => {
             className="p-2 border rounded"
             required
           />
-          <input
-            type="number"
-            name="amountToPay"
-            placeholder="Amount to Pay"
-            value={formData.amountToPay}
-            readOnly
-            className="p-2 border rounded"
-            required
-          />
+          <select
+            name="branch"
+            value={formData.branch || ""}
+            onChange={(e) => handleChange(e, "branch")}
+            className="border p-2 w-full"
+          >
+            <option value="">Select Branch</option>
+            {branches.map((branch) => (
+              <option key={branch.id} value={branch.id}>
+                {branch.name}
+              </option>
+            ))}
+          </select>
           <input
             type="text"
             name="agent"

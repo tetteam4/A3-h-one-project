@@ -17,10 +17,20 @@ const Sidebar = ({ setActiveComponent }) => {
 
   const Components = [
     { name: "Home", value: "home", icon: <FaTachometerAlt /> },
+    {
+      name: "Branch managements",
+      value: "Branch managements",
+      icon: <FaTachometerAlt />,
+    },
+    {
+      name: "User managements",
+      value: "user managements",
+      icon: <FaUserTie />,
+    },
     { name: "Send Money", value: "S_transactions", icon: <FaExchangeAlt /> },
     { name: "Receive Money", value: "R_transactions", icon: <FaExchangeAlt /> },
     { name: "Customer", value: "customer", icon: <FaUsers /> },
-    { name: "Agent", value: "agent", icon: <FaUserTie /> },
+
     { name: "Report", value: "report", icon: <FaChartBar /> },
     { name: "Settings", value: "setting", icon: <FaCog /> },
     { name: "Sign Out", value: "signout", icon: <FaSignOutAlt /> },

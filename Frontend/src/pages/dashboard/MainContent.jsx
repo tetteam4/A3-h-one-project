@@ -1,10 +1,11 @@
-import Agent from "./pages/agent";
 import Customer from "./pages/customers";
 import Dashboard from "./pages/dashboard";
 import S_Transaction from "./pages/S_transactions";
 import Report from "./pages/reports";
 import Setting from "./pages/setting";
 import R_Transaction from "./pages/R_transactions";
+import UserManagement from "./pages/userManagement";
+import BranchManagement from "./pages/BranchManagement";
 const MainContent = ({ activeComponent }) => {
   const renderContent = () => {
     switch (activeComponent) {
@@ -16,12 +17,14 @@ const MainContent = ({ activeComponent }) => {
         return <R_Transaction />;
       case "customer":
         return <Customer />;
-      case "agent":
-        return <Agent />;
+      case "user managements":
+        return <UserManagement />;
       case "report":
         return <Report />;
       case "setting":
         return <Setting />;
+      case "Branch managements":
+        return <BranchManagement />;
       default:
         return <Dashboard />;
     }
