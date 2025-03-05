@@ -1,34 +1,24 @@
+import logging
+
+from django.shortcuts import get_object_or_404
+from rest_framework import status, viewsets
+from rest_framework.response import Response
 
 from .models import Branch, Customer, Transactions
 from .serializers import BranchSerializer, CustomerSerializer, TransactionsSerializer
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
-from .models import Transactions
-from .serializers import TransactionsSerializer
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
-from .models import Transactions
-from .serializers import TransactionsSerializer
-from django.shortcuts import get_object_or_404
-
-import logging
 
 logger = logging.getLogger(__name__)
+
 
 class BranchViewSet(viewsets.ModelViewSet):
     queryset = Branch.objects.all()
     serializer_class = BranchSerializer
 
 
-
 class TransactionsViewSet(viewsets.ModelViewSet):
-    queryset = Transactions.objects.all()  
-    serializer_class = TransactionsSerializer #
-    lookup_field = 'id'
-    
+    queryset = Transactions.objects.all()
+    serializer_class = TransactionsSerializer  #
+
     def create(self, request, *args, **kwargs):
         # You can perform additional validation or processing before creating
         serializer = self.get_serializer(data=request.data)
@@ -51,9 +41,9 @@ class TransactionsViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         logger.info(f"Attempting to delete transaction with id: {kwargs['id']}")
         return super().destroy(request, *args, **kwargs)
-    
+
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer  
-    lookup_field = 'id'
+    serializer_class = CustomerSerializer
+   
