@@ -1,169 +1,141 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-const Agent = () => {
-  // Initial agent data
-  const [agents, setAgents] = useState([
-    {
-      id: 1,
-      name: "Ali Khan",
-      email: "ali@example.com",
-      phoneNumber: "0790001111",
-      profilePic: "",
-      location: "Kabul",
-    },
-    {
-      id: 2,
-      name: "Hassan Rahimi",
-      email: "hassan@example.com",
-      phoneNumber: "0782223333",
-      profilePic: "",
-      location: "Herat",
-    },
-    {
-      id: 3,
-      name: "Sara Ahmadi",
-      email: "sara@example.com",
-      phoneNumber: "0775556666",
-      profilePic: "",
-      location: "Mazar",
-    },
-  ]);
-
-  // New agent state
-  const [newAgent, setNewAgent] = useState({
-    name: "",
+const UserManagement = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
     email: "",
-    phoneNumber: "",
-    profilePic: "",
-    location: "",
+    role: null,
+    phone_number: "",
+    password: "",
+    password_confirm: "",
   });
 
-  // Handle input change
-  const handleChange = (e) => {
-    setNewAgent({ ...newAgent, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-  // Handle profile picture change
-  const handleProfilePicChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewAgent({ ...newAgent, profilePic: reader.result });
-      };
-      reader.readAsDataURL(file);
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/auth/api/create_user/"
+      );
+      setUsers(response.data);
+    } catch (error) {
+      setError("Failed to fetch users");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Add new agent
-  const addAgent = () => {
-    if (
-      !newAgent.name ||
-      !newAgent.email ||
-      !newAgent.phoneNumber ||
-      !newAgent.location
-    )
-      return;
-    setAgents([...agents, { id: agents.length + 1, ...newAgent }]);
-    setNewAgent({
-      name: "",
-      email: "",
-      phoneNumber: "",
-      profilePic: "",
-      location: "",
-    });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.post("http://localhost:8000/auth/api/create_user/", formData);
+      alert("User registered successfully");
+      fetchUsers();
+    } catch (error) {
+      alert("Registration failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="p-4 bg-white text-gray-900 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Agents</h1>
-      <p className="mb-4">Register, manage, and track Hawala agents.</p>
-
-      {/* Table to display agents */}
-      <table className="w-full border-collapse border border-gray-300 mb-4">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border p-2">ID</th>
-            <th className="border p-2">Profile</th>
-            <th className="border p-2">Name</th>
-            <th className="border p-2">Email</th>
-            <th className="border p-2">Phone</th>
-            <th className="border p-2">Location</th>
-          </tr>
-        </thead>
-        <tbody>
-          {agents.map((agent) => (
-            <tr key={agent.id} className="text-center">
-              <td className="border p-2">{agent.id}</td>
-              <td className="border p-2">
-                {agent.profilePic ? (
-                  <img
-                    src={agent.profilePic}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full mx-auto"
-                  />
-                ) : (
-                  "No Image"
-                )}
-              </td>
-              <td className="border p-2">{agent.name}</td>
-              <td className="border p-2">{agent.email}</td>
-              <td className="border p-2">{agent.phoneNumber}</td>
-              <td className="border p-2">{agent.location}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Form to add a new agent */}
-      <div className="flex flex-wrap gap-2">
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">User Management</h2>
+      <form onSubmit={handleSubmit} className="mb-4 space-y-2">
         <input
           type="text"
-          name="name"
-          placeholder="Agent Name"
-          value={newAgent.name}
+          name="first_name"
+          placeholder="First Name"
+          value={formData.first_name}
           onChange={handleChange}
-          className="border p-2 rounded w-1/4"
+          className="border p-2 w-full"
+          required
+        />
+        <input
+          type="text"
+          name="last_name"
+          placeholder="Last Name"
+          value={formData.last_name}
+          onChange={handleChange}
+          className="border p-2 w-full"
+          required
         />
         <input
           type="email"
           name="email"
           placeholder="Email"
-          value={newAgent.email}
+          value={formData.email}
           onChange={handleChange}
-          className="border p-2 rounded w-1/4"
+          className="border p-2 w-full"
+          required
+        />
+        <input
+          type="number"
+          name="role"
+          placeholder="Role"
+          value={formData.role || ""}
+          onChange={handleChange}
+          className="border p-2 w-full"
         />
         <input
           type="text"
-          name="phoneNumber"
+          name="phone_number"
           placeholder="Phone Number"
-          value={newAgent.phoneNumber}
+          value={formData.phone_number}
           onChange={handleChange}
-          className="border p-2 rounded w-1/4"
+          className="border p-2 w-full"
+          required
         />
         <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          value={newAgent.location}
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
           onChange={handleChange}
-          className="border p-2 rounded w-1/4"
+          className="border p-2 w-full"
+          required
         />
         <input
-          type="file"
-          accept="image/*"
-          onChange={handleProfilePicChange}
-          className="border p-2 rounded w-1/4"
+          type="password"
+          name="password_confirm"
+          placeholder="Confirm Password"
+          value={formData.password_confirm}
+          onChange={handleChange}
+          className="border p-2 w-full"
+          required
         />
-        <button
-          onClick={addAgent}
-          className="bg-blue-500 text-white p-2 rounded"
-        >
-          Add Agent
+        <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+          Register
         </button>
-      </div>
+      </form>
+
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+
+      <h3 className="text-lg font-bold mt-4">Registered Users</h3>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id} className="border-b p-2">
+            {user.first_name} {user.last_name} - {user.email} -{" "}
+            {user.phone_number}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
-export default Agent;
+export default UserManagement;
