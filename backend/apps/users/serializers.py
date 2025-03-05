@@ -23,6 +23,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
+            "role",
             "phone_number",
             "password",
             "password_confirm",
@@ -32,6 +33,10 @@ class CreateUserSerializer(serializers.ModelSerializer):
         # Ensure passwords match
         if data["password"] != data["password_confirm"]:
             raise ValidationError("Passwords must match.")
+
+        role = data.get("role")
+        if role not in dict(User.ROLE_CHOICES):
+            raise ValidationError("Invalid role.")
         return data
 
     def create(self, validated_data):
@@ -40,10 +45,10 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
             validated_data.pop("password_confirm", None)
 
-            with transaction.atomic():  
+            with transaction.atomic():
                 password = validated_data.pop("password", None)
                 user = User.objects.create(**validated_data)
-                user.set_password(password)  
+                user.set_password(password)
                 user.save()
                 return user
         except Exception as e:
@@ -58,6 +63,7 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
+            "role",
             "phone_number",
             "is_admin",
             "is_staff",
