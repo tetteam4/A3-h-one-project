@@ -1,48 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+const API_URL = "http://localhost:8000/api/api/customers/";
 
 const Customer = () => {
-  // Initial customer data
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: "Ahmad Sharifi",
-      fatherName: "Sharif",
-      idNumber: "123456",
-      phoneNumber: "0791112233",
-      biometric: "Yes",
-      verified: true,
-    },
-    {
-      id: 2,
-      name: "Zahra Habibi",
-      fatherName: "Habib",
-      idNumber: "654321",
-      phoneNumber: "0784445566",
-      biometric: "No",
-      verified: false,
-    },
-    {
-      id: 3,
-      name: "Mohammad Amini",
-      fatherName: "Amin",
-      idNumber: "987654",
-      phoneNumber: "0779998877",
-      biometric: "Yes",
-      verified: true,
-    },
-  ]);
-
-  // New customer state
+  const [customers, setCustomers] = useState([]);
   const [newCustomer, setNewCustomer] = useState({
     name: "",
-    fatherName: "",
-    idNumber: "",
-    phoneNumber: "",
-    biometric: "",
-    verified: false,
+    father_name: "",
+    phone_number: "",
+    id_card: "",
+    biometric: false,
   });
 
-  // Handle input change
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      setCustomers(response.data);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setNewCustomer({
@@ -51,45 +34,40 @@ const Customer = () => {
     });
   };
 
-  // Add new customer
-  const addCustomer = () => {
-    if (
-      !newCustomer.name ||
-      !newCustomer.fatherName ||
-      !newCustomer.idNumber ||
-      !newCustomer.phoneNumber ||
-      !newCustomer.biometric
-    )
+  const addCustomer = async () => {
+    if (!newCustomer.name || !newCustomer.father_name || !newCustomer.id_card)
       return;
-    setCustomers([...customers, { id: customers.length + 1, ...newCustomer }]);
-    setNewCustomer({
-      name: "",
-      fatherName: "",
-      idNumber: "",
-      phoneNumber: "",
-      biometric: "",
-      verified: false,
-    });
+
+    try {
+      const response = await axios.post(API_URL, {
+        ...newCustomer,
+        id_card: newCustomer.id_card ? parseInt(newCustomer.id_card, 10) : null,
+      });
+      setCustomers([...customers, response.data]);
+      setNewCustomer({
+        name: "",
+        father_name: "",
+        phone_number: "",
+        id_card: "",
+        biometric: false,
+      });
+    } catch (error) {
+      console.error("Error adding customer:", error);
+    }
   };
 
   return (
     <div className="p-4 bg-white text-gray-900 rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Customers</h1>
-      <p className="mb-4">
-        Manage customer details, transactions, and verification status.
-      </p>
-
-      {/* Table to display customers */}
       <table className="w-full border-collapse border border-gray-300 mb-4">
         <thead>
           <tr className="bg-gray-200">
             <th className="border p-2">ID</th>
             <th className="border p-2">Name</th>
             <th className="border p-2">Father Name</th>
-            <th className="border p-2">ID Number</th>
+            <th className="border p-2">ID Card</th>
             <th className="border p-2">Phone Number</th>
             <th className="border p-2">Biometric</th>
-            <th className="border p-2">Verified</th>
           </tr>
         </thead>
         <tbody>
@@ -97,17 +75,14 @@ const Customer = () => {
             <tr key={customer.id} className="text-center">
               <td className="border p-2">{customer.id}</td>
               <td className="border p-2">{customer.name}</td>
-              <td className="border p-2">{customer.fatherName}</td>
-              <td className="border p-2">{customer.idNumber}</td>
-              <td className="border p-2">{customer.phoneNumber}</td>
-              <td className="border p-2">{customer.biometric}</td>
-              <td className="border p-2">{customer.verified ? "✅" : "❌"}</td>
+              <td className="border p-2">{customer.father_name}</td>
+              <td className="border p-2">{customer.id_card}</td>
+              <td className="border p-2">{customer.phone_number || "N/A"}</td>
+              <td className="border p-2">{customer.biometric ? "✅" : "❌"}</td>
             </tr>
           ))}
         </tbody>
       </table>
-
-      {/* Form to add a new customer */}
       <div className="flex flex-wrap gap-2">
         <input
           type="text"
@@ -119,44 +94,36 @@ const Customer = () => {
         />
         <input
           type="text"
-          name="fatherName"
+          name="father_name"
           placeholder="Father Name"
-          value={newCustomer.fatherName}
+          value={newCustomer.father_name}
           onChange={handleChange}
           className="border p-2 rounded w-1/5"
         />
         <input
           type="text"
-          name="idNumber"
-          placeholder="ID Number"
-          value={newCustomer.idNumber}
+          name="id_card"
+          placeholder="ID Card"
+          value={newCustomer.id_card}
           onChange={handleChange}
           className="border p-2 rounded w-1/5"
         />
         <input
           type="text"
-          name="phoneNumber"
+          name="phone_number"
           placeholder="Phone Number"
-          value={newCustomer.phoneNumber}
-          onChange={handleChange}
-          className="border p-2 rounded w-1/5"
-        />
-        <input
-          type="text"
-          name="biometric"
-          placeholder="Biometric Data"
-          value={newCustomer.biometric}
+          value={newCustomer.phone_number}
           onChange={handleChange}
           className="border p-2 rounded w-1/5"
         />
         <label className="flex items-center space-x-2">
           <input
             type="checkbox"
-            name="verified"
-            checked={newCustomer.verified}
+            name="biometric"
+            checked={newCustomer.biometric}
             onChange={handleChange}
           />
-          <span>Verified</span>
+          <span>Biometric</span>
         </label>
         <button
           onClick={addCustomer}

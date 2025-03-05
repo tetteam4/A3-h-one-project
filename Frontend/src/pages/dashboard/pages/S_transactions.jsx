@@ -64,7 +64,7 @@ const S_Transaction = () => {
     e.preventDefault();
 
     try {
-      // Send sender data to API
+      // Prepare sender data
       const senderData = {
         name: formData.sender.name,
         father_name: formData.sender.fatherName,
@@ -73,6 +73,7 @@ const S_Transaction = () => {
         biometric: formData.sender.biometric || false,
       };
 
+      // Prepare receiver data
       const receiverData = {
         name: formData.receiver.name,
         father_name: formData.receiver.fatherName,
@@ -80,24 +81,64 @@ const S_Transaction = () => {
         id_card: formData.receiver.idNumber || null,
         biometric: formData.receiver.biometric || false,
       };
+
+      // Send sender data and get ID
       const resSender = await axios.post(
-        `${BASE_URL}/api/customers/`,
+        `${BASE_URL}/api/api/customers/`,
         senderData
       );
+      const senderId = resSender.data.id; // Assuming API returns { id: ... }
+      console.log(resSender);
+
+      // Send receiver data and get ID
       const resReceiver = await axios.post(
-        `${BASE_URL}/api/customers/`,
+        `${BASE_URL}/api/api/customers/`,
         receiverData
       );
-      
-      // Reset form data
+      const receiverId = resReceiver.data.id; // Assuming API returns { id: ... }
+      console.log(resReceiver);
+
+      // Prepare transaction data
+      const transactionData = {
+        branch: null,
+        sender: senderId,
+        receiver: receiverId,
+        amount: formData.amount || null,
+        fee: formData.commission || null,
+        status: "pending", // You can change this based on your logic
+      };
+
+      // Send transaction data to API
+      console.log(transactionData);
+
+      await axios.post(
+        `http://localhost:8000/api/api/transactions/`,
+        transactionData
+      );
+
+      // Reset form data after successful submission
       setFormData({
-        sender: { name: "", fatherName: "", phoneNumber: "" },
-        receiver: { name: "", fatherName: "", idNumber: "", biometric: "" },
+        sender: {
+          name: "",
+          fatherName: "",
+          phoneNumber: "",
+          idNumber: "",
+          biometric: false,
+        },
+        receiver: {
+          name: "",
+          fatherName: "",
+          phoneNumber: "",
+          idNumber: "",
+          biometric: false,
+        },
         amount: "",
         commission: "",
         amountToPay: "",
         agent: "",
       });
+
+      console.log("Transaction submitted successfully!");
     } catch (error) {
       console.error("Error submitting data:", error);
     }
