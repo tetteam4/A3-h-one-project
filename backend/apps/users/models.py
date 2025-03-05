@@ -1,7 +1,7 @@
 from profile import Profile
+
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
-
 
 
 class UserManager(BaseUserManager):
@@ -34,20 +34,27 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
+    Admin = 0
+    Branch_admin = 1
+    agent = 2
+    ROLE_CHOICES = (
+        (Admin, "Admin"),
+        (Branch_admin, "Branch admin"),
+        (agent, "Agent"),
+    )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
     phone_number = models.CharField(max_length=13, blank=True, null=True)
     otp = models.CharField(max_length=8, blank=True, null=True)
     refresh_token = models.CharField(max_length=1000, blank=True, null=True)
-
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     is_superadmin = models.BooleanField(default=False)
-
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
