@@ -3,12 +3,16 @@ from profile import Profile
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from apps.core.models import Branch
+from apps.core.serializers import BranchSerializer
 
 from .models import User, UserProfile
 
@@ -30,7 +34,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        # Ensure passwords match
         if data["password"] != data["password_confirm"]:
             raise ValidationError("Passwords must match.")
 
@@ -40,11 +43,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        """Create a new user with encrypted password."""
         try:
-
             validated_data.pop("password_confirm", None)
-
             with transaction.atomic():
                 password = validated_data.pop("password", None)
                 user = User.objects.create(**validated_data)
@@ -56,6 +56,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    branch = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.all())
+
     class Meta:
         model = User
         fields = [
@@ -64,12 +66,21 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "role",
+            "branch",
             "phone_number",
             "is_admin",
             "is_staff",
             "is_active",
             "is_superadmin",
         ]
+
+    def create(self, validated_data):
+        # Ensure branch_id is provided
+        branch_instance = validated_data.get("branch")
+        if branch_instance:
+            validated_data["branch"] = branch_instance.id
+
+        return super().create(validated_data)
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
