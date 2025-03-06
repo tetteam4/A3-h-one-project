@@ -27,7 +27,6 @@ ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["*"])
 
 # Application definition
 DJANGO_APPS = [
-    # "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -36,7 +35,6 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
     'django.contrib.sites',
     "ckeditor",
-    "jazzmin",
 ]
 
 LOCAL_APPS = ["apps.core", "apps.common","apps.users"]

@@ -26,7 +26,25 @@ class UserManager(BaseUserManager):
         return self.create_user(email, first_name, last_name, password, **extra_fields)
 
 
-class User(AbstractBaseUser):
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db import models
+
+class PermissionMixin:
+    def has_perm(self, perm, obj=None):
+        # Custom permission logic based on role
+        if self.is_superadmin:
+            return True  # Superadmins have all permissions
+        if self.role == User.Admin:
+            return perm in ["admin_perm1", "admin_perm2"]  # Example admin permissions
+        if self.role == User.Branch_admin:
+            return perm in ["branch_admin_perm1", "branch_admin_perm2"]  # Example branch admin permissions
+        return False  # Default for other roles
+
+    def has_module_perms(self, app_label):
+        # Custom logic for module permissions
+        return self.is_superadmin or self.is_staff
+
+class User(AbstractBaseUser, PermissionMixin):
     Admin = 0
     Branch_admin = 1
     agent = 2
@@ -63,14 +81,7 @@ class User(AbstractBaseUser):
 
     def __str__(self) -> str:
         return self.email
-
-    def has_perm(self, perm, obj=None):
-        return self.is_admin
-
-    def has_module_perms(self, app_label):
-        return True
-
-
+    
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     profile_pic = models.ImageField(
