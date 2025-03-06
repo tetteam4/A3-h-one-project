@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaBell, FaSearch, FaUserCircle } from "react-icons/fa";
 import { MdOutlineMessage } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
-import { signOutSuccess } from "../../state/userSlice/userSlice"; 
+import { signOutSuccess } from "../../state/userSlice/userSlice";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
@@ -29,7 +29,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    dispatch(signOutSuccess()); 
+    dispatch(signOutSuccess());
     navigate("/sign-in");
   };
 
@@ -44,14 +44,12 @@ const Navbar = () => {
         />
       </div>
 
-
       <div className="hidden md:flex flex-col text-center text-gray-600">
         <span className="text-sm font-semibold">
           {day}, {month} {dateNumber}, {year}
         </span>
       </div>
 
- 
       <div className="flex items-center gap-6">
         <FaBell className="text-2xl cursor-pointer text-primary hover:text-primary transition duration-300" />
         <MdOutlineMessage className="text-2xl cursor-pointer text-primary hover:text-primary transition duration-300" />
@@ -67,15 +65,14 @@ const Navbar = () => {
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            <FaUserCircle className="text-3xl" /> 
+            <FaUserCircle className="text-3xl" />
           )}
           <span className="text-sm font-medium hidden sm:block">
             {currentUser
-              ? `${currentUser.first_name} ${currentUser.last_name}`
+              ? `${currentUser.first_name ?? ""} ${currentUser.last_name ?? ""}`
               : "Loading..."}
           </span>
 
-          
           {isProfileOpen && (
             <div className="absolute right-0 mt-10 w-48 bg-white rounded-md shadow-xl z-10">
               <div className="py-1">
@@ -93,7 +90,7 @@ const Navbar = () => {
                 </a>
                 <button
                   onClick={handleLogout}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left w-full" // Added text-left and w-full for button styling
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left w-full"
                 >
                   Logout
                 </button>

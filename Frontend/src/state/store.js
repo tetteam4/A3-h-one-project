@@ -3,12 +3,13 @@ import userReducer from "./userSlice/userSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from 'redux-persist';
 import themeReducer from "./Theme/themeSlice";
+import allUsersReducer from "./userSlice/allUsersSlice";
 
 // Configure persistence
 const rootReducer = combineReducers({
   user: userReducer,
   theme: themeReducer,
-
+  allUsers: allUsersReducer,
 });
 
 // Configure redux persistence
