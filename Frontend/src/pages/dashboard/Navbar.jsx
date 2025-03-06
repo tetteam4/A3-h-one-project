@@ -3,7 +3,7 @@ import { FaBell, FaSearch, FaUserCircle } from "react-icons/fa";
 import { MdOutlineMessage } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { signOutSuccess } from "../../state/userSlice/userSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [day, setDay] = useState("");
@@ -82,12 +82,12 @@ const Navbar = () => {
                 >
                   Profile
                 </a>
-                <a
-                  href="#"
+                <Link
+                  to="setting"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   Settings
-                </a>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left w-full"
