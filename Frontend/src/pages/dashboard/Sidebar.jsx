@@ -10,19 +10,35 @@ import {
   FaSignOutAlt,
   FaBars,
 } from "react-icons/fa";
-import { useDispatch } from "react-redux"; 
+import { useDispatch } from "react-redux";
 import { signOutSuccess } from "../../state/userSlice/userSlice";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const Sidebar = ({ setActiveComponent }) => {
   const [selectedC, setSelectedC] = useState("home");
   const [activeC, setActiveC] = useState("home");
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const MySwal = withReactContent(Swal); // Create a SweetAlert2 instance
+
   const handleSignOut = () => {
-    dispatch(signOutSuccess()); 
-    navigate("/sign-in");
+    MySwal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, sign out!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(signOutSuccess());
+        navigate("/sign-in");
+      }
+    });
   };
 
   const Components = [
@@ -40,7 +56,6 @@ const Sidebar = ({ setActiveComponent }) => {
     { name: "Send Money", value: "S_transactions", icon: <FaExchangeAlt /> },
     { name: "Receive Money", value: "R_transactions", icon: <FaExchangeAlt /> },
     { name: "Customer", value: "customer", icon: <FaUsers /> },
-
     { name: "Report", value: "report", icon: <FaChartBar /> },
     { name: "Settings", value: "setting", icon: <FaCog /> },
     { name: "Sign Out", value: "signout", icon: <FaSignOutAlt /> },
@@ -64,7 +79,7 @@ const Sidebar = ({ setActiveComponent }) => {
           <li key={index} className="relative group">
             {component.name === "Sign Out" ? (
               <a
-                onClick={handleSignOut} // Call handleSignOut on click
+                onClick={handleSignOut}
                 className={`relative flex items-center w-full px-6 py-3 transition-all duration-300 rounded-l-3xl
                 ${
                   activeC === component.value
