@@ -18,9 +18,9 @@ export default function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/" element={<HomePage />} />
+
           </Route>
           <Route element={<OnlyAdminPrivateRoute />}>
-          
           </Route>
         </Routes>
         {/* <Footer /> */}
