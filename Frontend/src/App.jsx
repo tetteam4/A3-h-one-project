@@ -17,7 +17,10 @@ export default function App() {
           {/* <Route path="/userprofile" element={<UserProfilePage />} /> */}
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/setting" element={<Setting />} />
+            <Route path="/" element={<HomePage />} />
+
+          </Route>
+          <Route element={<OnlyAdminPrivateRoute />}>
           </Route>
           <Route element={<OnlyAdminPrivateRoute />}></Route>
         </Routes>
