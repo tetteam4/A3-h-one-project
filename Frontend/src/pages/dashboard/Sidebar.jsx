@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { SiWebmoney } from "react-icons/si";
 import {
   FaTachometerAlt,
@@ -10,10 +10,20 @@ import {
   FaSignOutAlt,
   FaBars,
 } from "react-icons/fa";
+import { useDispatch } from "react-redux"; 
+import { signOutSuccess } from "../../state/userSlice/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ setActiveComponent }) => {
   const [selectedC, setSelectedC] = useState("home");
   const [activeC, setActiveC] = useState("home");
+  const dispatch = useDispatch(); 
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    dispatch(signOutSuccess()); 
+    navigate("/sign-in");
+  };
 
   const Components = [
     { name: "Home", value: "home", icon: <FaTachometerAlt /> },
@@ -52,47 +62,83 @@ const Sidebar = ({ setActiveComponent }) => {
       <ul className="mt-6">
         {Components.map((component, index) => (
           <li key={index} className="relative group">
-            <a
-              onClick={() => {
-                setActiveComponent(component.value);
-                setSelectedC(component.value);
-                setActiveC(component.value);
-              }}
-              onMouseEnter={() => setActiveC(component.value)}
-              onMouseLeave={() => setActiveC(selectedC)}
-              className={`relative flex items-center w-full px-6 py-3 transition-all duration-300 rounded-l-3xl 
+            {component.name === "Sign Out" ? (
+              <a
+                onClick={handleSignOut} // Call handleSignOut on click
+                className={`relative flex items-center w-full px-6 py-3 transition-all duration-300 rounded-l-3xl
                 ${
                   activeC === component.value
                     ? "bg-white text-primary"
                     : "hover:bg-white text-white"
                 }`}
-            >
-              <span className="text-xl">{component.icon}</span>
+              >
+                <span className="text-xl">{component.icon}</span>
+                <span className="ml-4 text-lg font-semibold">
+                  {component.name}
+                </span>
 
-              <span className="ml-4 text-lg font-semibold">
-                {component.name}
-              </span>
-
-              {/* Circle Effects */}
-              <span
-                className={`absolute right-0 -top-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_35px_0_10px_white] 
-                  transition-opacity duration-100 
+                {/* Circle Effects */}
+                <span
+                  className={`absolute right-0 -top-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_35px_0_10px_white]
+                  transition-opacity duration-100
                   ${
                     activeC === component.value
                       ? "opacity-100"
                       : "opacity-0 group-hover:opacity-100"
                   }`}
-              ></span>
-              <span
-                className={`absolute right-0 -bottom-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_-35px_0_10px_white] 
-                  transition-opacity duration-100 
+                ></span>
+                <span
+                  className={`absolute right-0 -bottom-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_-35px_0_10px_white]
+                  transition-opacity duration-100
                   ${
                     activeC === component.value
                       ? "opacity-100"
                       : "opacity-0 group-hover:opacity-100"
                   }`}
-              ></span>
-            </a>
+                ></span>
+              </a>
+            ) : (
+              <a
+                onClick={() => {
+                  setActiveComponent(component.value);
+                  setSelectedC(component.value);
+                  setActiveC(component.value);
+                }}
+                onMouseEnter={() => setActiveC(component.value)}
+                onMouseLeave={() => setActiveC(selectedC)}
+                className={`relative flex items-center w-full px-6 py-3 transition-all duration-300 rounded-l-3xl
+                ${
+                  activeC === component.value
+                    ? "bg-white text-primary"
+                    : "hover:bg-white text-white"
+                }`}
+              >
+                <span className="text-xl">{component.icon}</span>
+                <span className="ml-4 text-lg font-semibold">
+                  {component.name}
+                </span>
+
+                {/* Circle Effects */}
+                <span
+                  className={`absolute right-0 -top-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_35px_0_10px_white]
+                  transition-opacity duration-100
+                  ${
+                    activeC === component.value
+                      ? "opacity-100"
+                      : "opacity-0 group-hover:opacity-100"
+                  }`}
+                ></span>
+                <span
+                  className={`absolute right-0 -bottom-12 w-12 h-12 bg-transparent rounded-full shadow-[35px_-35px_0_10px_white]
+                  transition-opacity duration-100
+                  ${
+                    activeC === component.value
+                      ? "opacity-100"
+                      : "opacity-0 group-hover:opacity-100"
+                  }`}
+                ></span>
+              </a>
+            )}
           </li>
         ))}
       </ul>
