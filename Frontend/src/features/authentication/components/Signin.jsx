@@ -1,9 +1,10 @@
-// frontend/src/pages/Signin.jsx
+import React from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Loader } from "lucide-react";
-import { Link } from "react-router-dom";
-import Input from "../SignUp/Input";
-import useSignin from "../../hooks/useSignin";
+import { Link, useNavigate } from "react-router-dom";
+import Input from "./Input";
+import useSignin from "../hooks/useSignin";
+import { useSelector } from "react-redux";
 
 const LoginPage = () => {
   const {
@@ -16,10 +17,18 @@ const LoginPage = () => {
     error,
   } = useSignin();
 
+  const navigate = useNavigate();
+  const { currentUser, accessToken } = useSelector((state) => state.user);
+
+  React.useEffect(() => {
+    if (currentUser && accessToken) {
+      navigate("/dashboard");
+    }
+  }, [currentUser, accessToken, navigate]);
+
   return (
     <div
       className="w-full h-screen flex justify-center items-center"
-      dir="rtl"
       style={{
         backgroundImage: 'url("/eur.png")',
         backgroundSize: "cover",
@@ -44,7 +53,7 @@ const LoginPage = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-4xl font-extrabold mb-8 text-center bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text"
           >
-            خوش آمدید
+            Welcome
           </motion.h2>
 
           <form onSubmit={handleSignin}>
@@ -56,7 +65,7 @@ const LoginPage = () => {
               <Input
                 icon={Mail}
                 type="email"
-                placeholder="ایمیل"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -70,7 +79,7 @@ const LoginPage = () => {
               <Input
                 icon={Lock}
                 type="password"
-                placeholder="رمز عبور"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -86,7 +95,7 @@ const LoginPage = () => {
                 to="/forgot-password"
                 className="text-sm text-cyan-400 hover:underline"
               >
-                رمز عبور را فراموش کرده اید؟
+                Forgot password?
               </Link>
             </motion.div>
 
@@ -111,7 +120,7 @@ const LoginPage = () => {
               {isLoading ? (
                 <Loader className="w-6 h-6 animate-spin mx-auto" />
               ) : (
-                "ورود"
+                "Login"
               )}
             </motion.button>
           </form>
@@ -124,9 +133,9 @@ const LoginPage = () => {
           className="px-8 py-4 bg-gray-800 bg-opacity-70 flex justify-center"
         >
           <p className="text-sm text-gray-300">
-            حساب ندارید؟{" "}
+            Don't have an account?{" "}
             <Link to="/sign-up" className="text-cyan-400 hover:underline">
-              ثبت نام کنید
+              Sign up
             </Link>
           </p>
         </motion.div>
