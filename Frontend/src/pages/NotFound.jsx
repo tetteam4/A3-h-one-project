@@ -5,7 +5,6 @@ function NotFound() {
   const history = useHistory();
 
   useEffect(() => {
-    // Redirect to the login page after 3 seconds
     const timer = setTimeout(() => {
       history.push('/login');
     }, 3000);
