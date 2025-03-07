@@ -10,7 +10,6 @@ function NotFound() {
       history.push('/login');
     }, 3000);
 
-    // Cleanup the timer if the component is unmounted before the timeout completes
     return () => clearTimeout(timer);
   }, [history]);
 
