@@ -4,6 +4,7 @@ import PrivateRoute from "./components/common/PrivateRoute";
 import OnlyAdminPrivateRoute from "./components/common/OnlyAdmin";
 import ScrollTop from "./components/common/ScrollTop";
 import Signin from "./features/authentication/components/Signin";
+import NotFound from "./pages/NotFound";
 export default function App() {
   return (
     <div>
@@ -11,10 +12,9 @@ export default function App() {
         <ScrollTop />
         <Routes>
           <Route path="/sign-in" element={<Signin />} />
-          {/* <Route path="/sign-up" element={<Signup />} /> */}
+          <Route path="/sign-up" element={<NotFound/>} />
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-
           </Route>
           <Route element={<OnlyAdminPrivateRoute />}>
           </Route>
