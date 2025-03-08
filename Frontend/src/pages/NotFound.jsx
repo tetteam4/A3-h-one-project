@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // import useNavigate instead of useHistory
+import { useNavigate } from 'react-router-dom';
 
 function NotFound() {
-  const navigate = useNavigate(); // useNavigate hook to navigate programmatically
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/sign-in'); // use navigate() to redirect to /login
+      navigate('/sign-in');
     }, 3000);
 
-    return () => clearTimeout(timer); // clean up the timer when component unmounts
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   return (

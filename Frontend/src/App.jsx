@@ -11,16 +11,22 @@ export default function App() {
       <BrowserRouter>
         <ScrollTop />
         <Routes>
+          {/* public routes all users */}
           <Route path="/sign-in" element={<Signin />} />
-          <Route path="/sign-up" element={<NotFound/>} />
+          <Route path="*" element={<NotFound />} />
+
+          {/* private route for users*/}
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
+       
+
+          {/* only admin */}
           <Route element={<OnlyAdminPrivateRoute />}>
+          
           </Route>
-          <Route element={<OnlyAdminPrivateRoute />}></Route>
+
         </Routes>
-        {/* <Footer /> */}
       </BrowserRouter>
     </div>
   );

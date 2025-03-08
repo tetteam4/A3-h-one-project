@@ -8,7 +8,6 @@ const initialState = {
   error: null,
   loading: false,
 };
-
 export const signIn = createAsyncThunk(
   "user/signIn",
   async (credentials, { rejectWithValue }) => {
@@ -30,7 +29,6 @@ export const signIn = createAsyncThunk(
       );
       const users = userProfileResponse.data;
 
-      // Find the logged-in user based on email
       const loggedInUser = users.find(
         (user) => user.email === credentials.email
       );
@@ -44,10 +42,27 @@ export const signIn = createAsyncThunk(
       return { accessToken: access, refreshToken: refresh, userData };
     } catch (error) {
       console.error("Login failed:", error);
-      return rejectWithValue(error.response?.data?.detail || "Login failed");
+
+      if (error.response) {
+        if (error.response.status === 401) {
+          const detail = error.response.data.detail;
+          if (detail) {
+            return rejectWithValue(detail);  
+          } else {
+            return rejectWithValue("Incorrect email or password. Please try again."); 
+          }
+        } else {
+          return rejectWithValue(error.response.data.detail || "Login failed");
+        }
+      } else if (error.request) {
+        return rejectWithValue("Network error. Please check your connection.");
+      } else {
+        return rejectWithValue("An unexpected error occurred.");
+      }
     }
   }
 );
+
 
 export const updateUser = createAsyncThunk(
   "user/updateUser",

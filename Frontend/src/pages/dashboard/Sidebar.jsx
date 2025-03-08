@@ -8,7 +8,6 @@ import {
   FaChartBar,
   FaCog,
   FaSignOutAlt,
-  FaBars,
 } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { signOutSuccess } from "../../state/userSlice/userSlice";
