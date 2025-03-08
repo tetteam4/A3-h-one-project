@@ -43,6 +43,7 @@ class Transactions(models.Model):
     User = get_user_model()
     STATUS_CHOICES = (
         ("Complete", "Complete"),
+        ("pending", "Pending"),
         ("Cancel", "Cancel"),
     )
     current_branch = models.ForeignKey(
