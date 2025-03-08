@@ -33,7 +33,7 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ("is_active",  "is_staff")
 
     # Fields that are editable in the list view
-    list_editable = ("is_active", "is_staff")
+    list_editable = ("is_active", "is_staff" )
 
     # Fields to display in the detail view (form to create/edit a user)
     fieldsets = (
@@ -44,7 +44,7 @@ class UserAdmin(admin.ModelAdmin):
             "fields": ("first_name", "last_name", "phone_number")
         }),
         ("Permissions", {
-            "fields": ("is_active", "is_staff", "is_superadmin", )
+            "fields": ("is_active", "is_staff", "is_superadmin","is_admin" )
         }),
         ("Important Dates", {
             "fields": ("created_at", "updated_at")

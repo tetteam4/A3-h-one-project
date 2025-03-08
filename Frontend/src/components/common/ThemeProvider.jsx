@@ -12,6 +12,7 @@ export default function ThemeProvider({children}) {
      </div>
   );
 }
+
 ThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

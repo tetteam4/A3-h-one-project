@@ -1,17 +1,32 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { updateUser } from "../../../state/userSlice/userSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Setting = () => {
+  const { currentUser, loading } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
   const [userSettings, setUserSettings] = useState({
-    name: "John Doe",
-    email: "johndoe@example.com",
-    password: "********",
-    enable2FA: false,
-    pin: "****",
-    notifications: {
-      email: true,
-      sms: false,
-    },
+    email: "", // Initialize with empty strings
+    phone_number: "",
+    old_password: "",
+    password: "",
+    confirm_password: "",
   });
+
+  useEffect(() => {
+    if (currentUser) {
+      setUserSettings({
+        email: currentUser.email || "",
+        phone_number: currentUser.phone_number || "",
+        old_password: "",
+        password: "",
+        confirm_password: "",
+      });
+    }
+  }, [currentUser]);
 
   const handleChange = (field, value) => {
     setUserSettings((prev) => ({
@@ -20,6 +35,40 @@ const Setting = () => {
     }));
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (userSettings.password !== userSettings.confirm_password) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    try {
+      if (!currentUser || !currentUser.id) {
+        toast.error("User ID is not available. Please refresh the page.");
+        return;
+      }
+
+      const userId = currentUser.id;
+      const response = await dispatch(
+        updateUser({ id: userId, userData: userSettings })
+      );
+
+      if (response.payload.success) {
+        toast.success("Settings updated successfully!");
+      } else {
+        toast.error(response.payload.message || "Failed to update settings.");
+      }
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      toast.error("An error occurred while updating settings.");
+    }
+  };
+
+  if (loading) {
+    return <div>Loading settings...</div>; // Or a more sophisticated loading indicator
+  }
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold text-gray-800 mb-4">⚙️ Settings</h1>
@@ -27,93 +76,79 @@ const Setting = () => {
         Configure system preferences, security settings, and notifications.
       </p>
 
-      {/* User Profile */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold text-gray-700 mb-2">
-          👤 User Profile
-        </h2>
-        <div className="space-y-2">
-          <input
-            type="text"
-            className="w-full p-2 border rounded"
-            value={userSettings.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-          />
-          <input
-            type="email"
-            className="w-full p-2 border rounded"
-            value={userSettings.email}
-            onChange={(e) => handleChange("email", e.target.value)}
-          />
-          <input
-            type="password"
-            className="w-full p-2 border rounded"
-            value={userSettings.password}
-            onChange={(e) => handleChange("password", e.target.value)}
-          />
-        </div>
-      </div>
+      <form onSubmit={handleSubmit}>
+        {/* User Profile */}
+        <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+          <h2 className="text-xl font-bold text-gray-700 mb-2">
+            👤 User Profile
+          </h2>
+          <div className="space-y-2">
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              id="email"
+              className="w-full p-2 border rounded"
+              value={userSettings.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+            />
 
-      {/* Security Settings */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold text-gray-700 mb-2">
-          🔒 Security Settings
-        </h2>
-        <div className="space-y-2">
-          <label className="flex items-center space-x-2">
+            <label htmlFor="phone_number">Phone Number:</label>
             <input
-              type="checkbox"
-              checked={userSettings.enable2FA}
-              onChange={() =>
-                handleChange("enable2FA", !userSettings.enable2FA)
-              }
+              type="text"
+              id="phone_number"
+              className="w-full p-2 border rounded"
+              value={userSettings.phone_number}
+              onChange={(e) => handleChange("phone_number", e.target.value)}
             />
-            <span>Enable Two-Factor Authentication</span>
-          </label>
-          <input
-            type="password"
-            className="w-full p-2 border rounded"
-            value={userSettings.pin}
-            onChange={(e) => handleChange("pin", e.target.value)}
-            placeholder="Enter PIN"
-          />
+          </div>
         </div>
-      </div>
 
-      {/* Notifications */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold text-gray-700 mb-2">
-          📢 Notifications
-        </h2>
-        <div className="space-y-2">
-          <label className="flex items-center space-x-2">
+        {/* Security Settings */}
+        <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+          <h2 className="text-xl font-bold text-gray-700 mb-2">
+            🔒 Security Settings
+          </h2>
+          <div className="space-y-2">
+            <label htmlFor="old_password">Old Password:</label>
             <input
-              type="checkbox"
-              checked={userSettings.notifications.email}
-              onChange={() =>
-                handleChange("notifications", {
-                  ...userSettings.notifications,
-                  email: !userSettings.notifications.email,
-                })
-              }
+              type="password"
+              id="old_password"
+              className="w-full p-2 border rounded"
+              value={userSettings.old_password}
+              onChange={(e) => handleChange("old_password", e.target.value)}
+              placeholder="Enter Old Password"
             />
-            <span>Email Notifications</span>
-          </label>
-          <label className="flex items-center space-x-2">
+
+            <label htmlFor="password">New Password:</label>
             <input
-              type="checkbox"
-              checked={userSettings.notifications.sms}
-              onChange={() =>
-                handleChange("notifications", {
-                  ...userSettings.notifications,
-                  sms: !userSettings.notifications.sms,
-                })
-              }
+              type="password"
+              id="password"
+              className="w-full p-2 border rounded"
+              value={userSettings.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+              placeholder="Enter New Password"
             />
-            <span>SMS Notifications</span>
-          </label>
+
+            <label htmlFor="confirm_password">Confirm New Password:</label>
+            <input
+              type="password"
+              id="confirm_password"
+              className="w-full p-2 border rounded"
+              value={userSettings.confirm_password}
+              onChange={(e) => handleChange("confirm_password", e.target.value)}
+              placeholder="Confirm New Password"
+            />
+          </div>
         </div>
-      </div>
+
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Update Settings
+        </button>
+      </form>
+      <ToastContainer />
     </div>
   );
 };

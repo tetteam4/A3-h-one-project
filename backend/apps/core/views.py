@@ -39,11 +39,10 @@ class TransactionsViewSet(viewsets.ModelViewSet):
 
     # Optional: Customizing the 'destroy' method if needed
     def destroy(self, request, *args, **kwargs):
-        logger.info(f"Attempting to delete transaction with id: {kwargs['id']}")
+        # logger.info(f"Attempting to delete transaction with id: {kwargs['id']}")
         return super().destroy(request, *args, **kwargs)
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-   
