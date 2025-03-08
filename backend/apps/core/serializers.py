@@ -37,17 +37,20 @@ class TransactionsSerializer(serializers.ModelSerializer):
     secret_key = serializers.IntegerField(read_only=True)
     sender = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
     receiver = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
+    agent = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     class Meta:
         model = Transactions
         fields = [
             "id",
-            "branch",
+            "current_branch",
+            "to_branch",
             "branch_name",
             "sender",
             "receiver",
             "amount",
             "fee",
+            "agent",
             "amount_pay",
             "status",
             "secret_key",
@@ -55,8 +58,8 @@ class TransactionsSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-    def get_branch_method(self, obj):
-        return obj.branch.name if obj.branch else None
+    def get_branch_name(self, obj):
+        return obj.current_branch.name if obj.current_branch else None
 
     def validate(self, data):
         """
