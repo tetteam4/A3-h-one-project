@@ -19,13 +19,8 @@ export default function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
-       
-
           {/* only admin */}
-          <Route element={<OnlyAdminPrivateRoute />}>
-          
-          </Route>
-
+          <Route element={<OnlyAdminPrivateRoute />}></Route>
         </Routes>
       </BrowserRouter>
     </div>

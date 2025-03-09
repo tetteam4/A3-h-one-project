@@ -1,29 +1,70 @@
+// Transactions.jsx
 import { useEffect, useState } from "react";
+import axios from "axios";
+import CustomerModal from "./CustomerModel";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [customers, setCustomers] = useState([]);
+  const [branches, setBranches] = useState([]);
+  const [showData, setShowData] = useState(false);
+  const [dataToShow, setDataToShow] = useState(null);
+
+  const fetchBranches = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/api/branches/`);
+      setBranches(response.data);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/api/transactions/`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch transactions");
+      }
+      const data = await response.json();
+      setTransactions(data);
+      console.log(data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/api/customers/`);
+      setCustomers(response.data);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+    }
+  };
+
+  const handleShowData = (id) => {
+    const customer = customers.find((customer) => customer.id === id);
+    if (customer) {
+      setDataToShow(customer);
+      setShowData(true);
+    }
+  };
+
+  const handleCloseData = () => {
+    setShowData(false);
+    setDataToShow(null);
+  };
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8000/api/api/transactions/"
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch transactions");
-        }
-        const data = await response.json();
-        setTransactions(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchTransactions();
+    fetchCustomers();
+    fetchBranches();
   }, []);
 
   if (loading) return <p>Loading transactions...</p>;
@@ -51,9 +92,32 @@ const Transactions = () => {
           {transactions.map((transaction) => (
             <tr key={transaction.id} className="border">
               <td className="border p-2">{transaction.id}</td>
-              <td className="border p-2">{transaction.branch}</td>
-              <td className="border p-2">{transaction.sender}</td>
-              <td className="border p-2">{transaction.receiver}</td>
+              <td className="border p-2">
+                {
+                  branches.find((branch) => branch.id === transaction.branch)
+                    ?.name
+                }
+              </td>
+              <td
+                className="border p-2 text-blue-500 cursor-pointer"
+                onClick={() => handleShowData(transaction.sender)}
+              >
+                {
+                  customers.find(
+                    (customer) => customer.id === transaction.sender
+                  )?.name
+                }
+              </td>
+              <td
+                className="border p-2 text-blue-500 cursor-pointer"
+                onClick={() => handleShowData(transaction.receiver)}
+              >
+                {
+                  customers.find(
+                    (customer) => customer.id === transaction.receiver
+                  )?.name
+                }
+              </td>
               <td className="border p-2">{transaction.amount}</td>
               <td className="border p-2">{transaction.fee}</td>
               <td className="border p-2">{transaction.amount_pay}</td>
@@ -66,6 +130,8 @@ const Transactions = () => {
           ))}
         </tbody>
       </table>
+
+      <CustomerModal customer={dataToShow} onClose={handleCloseData} />
     </div>
   );
 };

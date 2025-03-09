@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios, { Axios } from "axios";
+import { useSelector } from "react-redux";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const S_Transaction = () => {
@@ -24,12 +25,12 @@ const S_Transaction = () => {
     },
     amount: "",
     commission: "",
-    amountToPay: "",
     agent: "",
+    current_branch: "",
+    to_branch: "",
   });
-
   const [modalType, setModalType] = useState(null);
-
+  const user = useSelector((state) => state.user.currentUser);
   const openModal = (type) => setModalType(type);
   const closeModal = () => {
     setModalType(null);
@@ -44,8 +45,7 @@ const S_Transaction = () => {
     if (
       section === "amount" ||
       section === "commission" ||
-      section === "amountToPay" ||
-      section === "agent"
+      section === "amountToPay"
     ) {
       setFormData((prev) => ({
         ...prev,
@@ -55,11 +55,17 @@ const S_Transaction = () => {
             ? prev.amount - prev.commission
             : prev.amountToPay,
       }));
-    } else if (section === "branch") {
+    } else if (section === "to_branch") {
       // Update branch separately
       setFormData((prev) => ({
         ...prev,
-        branch: value, // Set branch directly
+        to_branch: value, // Set branch directly
+      }));
+    } else if (section === "current_branch") {
+      // Update branch separately
+      setFormData((prev) => ({
+        ...prev,
+        current_branch: value, // Set branch directly
       }));
     } else {
       setFormData((prev) => ({
@@ -81,6 +87,7 @@ const S_Transaction = () => {
   };
   useEffect(() => {
     fetchBranches();
+    console.log(user);
   }, []);
 
   const handleSubmit = async (e) => {
@@ -123,21 +130,20 @@ const S_Transaction = () => {
 
       // Prepare transaction data
       const transactionData = {
-        branch: formData.branch,
+        current_branch: formData.current_branch, // Fix: Use current_branch instead of branch
         sender: senderId,
         receiver: receiverId,
         amount: formData.amount || null,
         fee: formData.commission || null,
-        status: "Complete", // You can change this based on your logic
+        status: "pending",
+        agent: user.id || null,
+        to_branch: formData.to_branch, // Make sure this is included if needed
       };
 
       // Send transaction data to API
       console.log(transactionData);
 
-      await axios.post(
-        `http://localhost:8000/api/api/transactions/`,
-        transactionData
-      );
+      await axios.post(`${BASE_URL}/api/api/transactions/`, transactionData);
 
       // Reset form data after successful submission
       setFormData({
@@ -168,20 +174,16 @@ const S_Transaction = () => {
   };
 
   const handleResetModel = (modelType) => {
-    setFormData((prevData) => {
-      if (modelType === "sender") {
-        return {
-          ...prevData,
-          sender: { name: "", fatherName: "", phoneNumber: "" },
-        };
-      } else if (modelType === "receiver") {
-        return {
-          ...prevData,
-          receiver: { name: "", fatherName: "", idNumber: "", biometric: "" },
-        };
-      }
-      return prevData;
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      [modelType]: {
+        name: "",
+        fatherName: "",
+        phoneNumber: "",
+        idNumber: "",
+        biometric: false,
+      },
+    }));
   };
 
   return (
@@ -223,9 +225,22 @@ const S_Transaction = () => {
             required
           />
           <select
-            name="branch"
-            value={formData.branch || ""}
-            onChange={(e) => handleChange(e, "branch")}
+            name="to_branch"
+            value={formData.to_branch || ""}
+            onChange={(e) => handleChange(e, "to_branch")}
+            className="border p-2 w-full"
+          >
+            <option value="">Select to Branch</option>
+            {branches.map((branch) => (
+              <option key={branch.id} value={branch.id}>
+                {branch.name}
+              </option>
+            ))}
+          </select>
+          <select
+            name="current_branch"
+            value={formData.current_branch || ""}
+            onChange={(e) => handleChange(e, "current_branch")}
             className="border p-2 w-full"
           >
             <option value="">Select Branch</option>
@@ -235,15 +250,6 @@ const S_Transaction = () => {
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            name="agent"
-            placeholder="Agent"
-            value={formData.agent}
-            onChange={(e) => handleChange(e, "agent")}
-            className="p-2 border rounded"
-            required
-          />
         </div>
         <button
           type="submit"
@@ -285,18 +291,26 @@ const S_Transaction = () => {
               onChange={(e) => handleChange(e, modalType)}
               className="p-2 border rounded w-full mb-2"
             />
-            <input
-              type="text"
-              name="biometric"
-              placeholder="Biometric Data"
-              value={formData[modalType].biometric}
-              onChange={(e) => handleChange(e, modalType)}
-              className="p-2 border rounded w-full mb-2"
-            />
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="biometric"
+                checked={formData[modalType].biometric}
+                onChange={(e) =>
+                  handleChange(
+                    { target: { name: "biometric", value: e.target.checked } },
+                    modalType
+                  )
+                }
+                className="p-2 border rounded mr-2"
+              />
+              Biometric Data
+            </label>
+
             <input
               type="text"
               name="phoneNumber"
-              placeholder="Phone Number"
+              placeholder="+93777889911"
               value={formData[modalType].phoneNumber}
               onChange={(e) => handleChange(e, modalType)}
               className="p-2 border rounded w-full mb-2"
