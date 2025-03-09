@@ -1,9 +1,10 @@
 import random
 
-from apps.common.models import TimeStampedUUIDModel
 from django.contrib.auth import get_user_model
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
+from apps.common.models import TimeStampedUUIDModel
 
 
 class Branch(models.Model):
@@ -30,7 +31,7 @@ class Customer(models.Model):
     father_name = models.CharField(max_length=255)
     id_card = models.PositiveSmallIntegerField()
     biometric = models.BooleanField(default=True)
-    phone_number = PhoneNumberField(blank=True, null=True)
+    phone_number = models.IntegerField(blank=True, null=True, max_length=14)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
