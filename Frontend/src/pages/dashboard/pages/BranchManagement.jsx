@@ -31,8 +31,8 @@ const BranchManagement = () => {
     try {
       const response = await axios.get("http://localhost:8000/auth/api/users/");
       // Filter users with role = 1
-      const filteredUsers = response.data.filter((user) => user.role === 1);
-      setUsers(filteredUsers);
+      // const filteredUsers = response.data.filter((user) => user.role === 1);
+      setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
     }

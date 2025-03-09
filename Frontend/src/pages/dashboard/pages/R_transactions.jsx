@@ -31,6 +31,7 @@ const Transactions = () => {
       }
       const data = await response.json();
       setTransactions(data);
+      console.log(data);
     } catch (error) {
       setError(error.message);
     } finally {
