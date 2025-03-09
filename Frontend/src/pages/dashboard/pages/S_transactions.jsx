@@ -93,8 +93,11 @@ const S_Transaction = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    let senderId = null;
+    let receiverId = null;
+
     try {
-      // Prepare sender data
+      // Prepare sender and receiver data
       const senderData = {
         name: formData.sender.name,
         father_name: formData.sender.fatherName,
@@ -103,7 +106,6 @@ const S_Transaction = () => {
         biometric: formData.sender.biometric || false,
       };
 
-      // Prepare receiver data
       const receiverData = {
         name: formData.receiver.name,
         father_name: formData.receiver.fatherName,
@@ -112,64 +114,83 @@ const S_Transaction = () => {
         biometric: formData.receiver.biometric || false,
       };
 
-      // Send sender data and get ID
-      const resSender = await axios.post(
-        `${BASE_URL}/api/api/customers/`,
-        senderData
-      );
-      const senderId = resSender.data.id; // Assuming API returns { id: ... }
-      console.log(resSender);
+      // Create sender and receiver concurrently
+      const [resSender, resReceiver] = await Promise.all([
+        axios.post(`${BASE_URL}/api/api/customers/`, senderData),
+        axios.post(`${BASE_URL}/api/api/customers/`, receiverData),
+      ]);
 
-      // Send receiver data and get ID
-      const resReceiver = await axios.post(
-        `${BASE_URL}/api/api/customers/`,
-        receiverData
-      );
-      const receiverId = resReceiver.data.id; // Assuming API returns { id: ... }
-      console.log(resReceiver);
+      senderId = resSender.data.id;
+      receiverId = resReceiver.data.id;
+      console.log(resSender, resReceiver);
 
       // Prepare transaction data
       const transactionData = {
-        current_branch: formData.current_branch, // Fix: Use current_branch instead of branch
+        current_branch: 1,
         sender: senderId,
         receiver: receiverId,
         amount: formData.amount || null,
         fee: formData.commission || null,
         status: "pending",
         agent: user.id || null,
-        to_branch: formData.to_branch, // Make sure this is included if needed
+        to_branch: formData.to_branch,
       };
 
-      // Send transaction data to API
-      console.log(transactionData);
+      // Send transaction data
+      const transaction = await axios.post(
+        `${BASE_URL}/api/api/transactions/`,
+        transactionData
+      );
 
-      await axios.post(`${BASE_URL}/api/api/transactions/`, transactionData);
-
-      // Reset form data after successful submission
-      setFormData({
-        sender: {
-          name: "",
-          fatherName: "",
-          phoneNumber: "",
-          idNumber: "",
-          biometric: false,
-        },
-        receiver: {
-          name: "",
-          fatherName: "",
-          phoneNumber: "",
-          idNumber: "",
-          biometric: false,
-        },
-        amount: "",
-        commission: "",
-        amountToPay: "",
-        agent: "",
-      });
-
-      console.log("Transaction submitted successfully!");
+      if (transaction.status === 201) {
+        // Reset form on success
+        setFormData({
+          sender: {
+            name: "",
+            fatherName: "",
+            phoneNumber: "",
+            idNumber: "",
+            biometric: false,
+          },
+          receiver: {
+            name: "",
+            fatherName: "",
+            phoneNumber: "",
+            idNumber: "",
+            biometric: false,
+          },
+          amount: "",
+          commission: "",
+          amountToPay: "",
+          agent: "",
+        });
+        console.log("Transaction submitted successfully!", transaction);
+      } else {
+        throw new Error("Transaction creation failed.");
+      }
     } catch (error) {
       console.error("Error submitting data:", error);
+      alert("An error occurred. The operation has been cancelled.");
+
+      // Rollback sender if created
+      if (senderId) {
+        try {
+          await axios.delete(`${BASE_URL}/api/api/customers/${senderId}/`);
+          console.log("Sender data rolled back successfully.");
+        } catch (rollbackError) {
+          console.error("Failed to rollback sender data:", rollbackError);
+        }
+      }
+
+      // Rollback receiver if created
+      if (receiverId) {
+        try {
+          await axios.delete(`${BASE_URL}/api/api/customers/${receiverId}/`);
+          console.log("Receiver data rolled back successfully.");
+        } catch (rollbackError) {
+          console.error("Failed to rollback receiver data:", rollbackError);
+        }
+      }
     }
   };
 
@@ -231,19 +252,6 @@ const S_Transaction = () => {
             className="border p-2 w-full"
           >
             <option value="">Select to Branch</option>
-            {branches.map((branch) => (
-              <option key={branch.id} value={branch.id}>
-                {branch.name}
-              </option>
-            ))}
-          </select>
-          <select
-            name="current_branch"
-            value={formData.current_branch || ""}
-            onChange={(e) => handleChange(e, "current_branch")}
-            className="border p-2 w-full"
-          >
-            <option value="">Select Branch</option>
             {branches.map((branch) => (
               <option key={branch.id} value={branch.id}>
                 {branch.name}
