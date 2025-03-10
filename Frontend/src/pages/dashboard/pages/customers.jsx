@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-const API_URL = "http://localhost:8000/api/api/customers/";
-
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_URL = `${BASE_URL}/api/api/customers/`;
 const Customer = () => {
   const [customers, setCustomers] = useState([]);
   const [newCustomer, setNewCustomer] = useState({
