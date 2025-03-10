@@ -6,6 +6,7 @@ import Setting from "./pages/setting";
 import R_Transaction from "./pages/R_transactions";
 import UserManagement from "./pages/userManagement";
 import BranchManagement from "./pages/BranchManagement";
+import { Wallet } from "./pages/Wallet";
 const MainContent = ({ activeComponent }) => {
   const renderContent = () => {
     switch (activeComponent) {
@@ -23,6 +24,8 @@ const MainContent = ({ activeComponent }) => {
         return <Report />;
       case "setting":
         return <Setting />;
+      case "Wallet":
+        return <Wallet />;
       case "Branch managements":
         return <BranchManagement />;
       default:

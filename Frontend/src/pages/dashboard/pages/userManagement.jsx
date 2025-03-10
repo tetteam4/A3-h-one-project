@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -34,7 +35,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/auth/api/users/");
+      const response = await axios.get(`${BASE_URL}/auth/api/users/`);
       setUsers(response.data);
     } catch (error) {
       setError("Failed to fetch users");
@@ -45,9 +46,7 @@ const UserManagement = () => {
 
   const fetchBranches = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/api/branches/"
-      );
+      const response = await axios.get(`${BASE_URL}/api/api/branches/`);
       setBranches(response.data);
     } catch (error) {
       console.error("Error fetching branches:", error);
@@ -60,12 +59,12 @@ const UserManagement = () => {
     try {
       if (isEditMode) {
         await axios.put(
-          `http://localhost:8000/auth/api/users/${editUserId}/`,
+          `${BASE_URL}/auth/api/users/${editUserId}/`,
           formData
         );
         alert("User updated successfully");
       } else {
-        await axios.post("http://localhost:8000/auth/api/users/", formData);
+        await axios.post(`${BASE_URL}/auth/api/users/`, formData);
         alert("User registered successfully");
       }
       fetchUsers();
@@ -87,7 +86,7 @@ const UserManagement = () => {
   const handleDelete = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        await axios.delete(`http://localhost:8000/auth/api/users/${userId}/`);
+        await axios.delete(`${BASE_URL}/auth/api/users/${userId}/`);
         alert("User deleted successfully");
         fetchUsers();
       } catch (error) {

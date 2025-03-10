@@ -78,7 +78,7 @@ const S_Transaction = () => {
   const fetchBranches = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/api/branches/"
+        `${BASE_URL}/api/api/branches/`
       );
       setBranches(response.data);
     } catch (error) {

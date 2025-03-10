@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 import axios from "axios";
 
 const BranchManagement = () => {
@@ -19,7 +20,7 @@ const BranchManagement = () => {
   const fetchBranches = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/api/branches/"
+        `${BASE_URL}/api/api/branches/`
       );
       setBranches(response.data);
     } catch (error) {
@@ -29,7 +30,7 @@ const BranchManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/auth/api/users/");
+      const response = await axios.get(`${BASE_URL}/auth/api/users/`);
       // Filter users with role = 1
       // const filteredUsers = response.data.filter((user) => user.role === 1);
       setUsers(response.data);
@@ -48,12 +49,12 @@ const BranchManagement = () => {
       if (editingId) {
         // Update existing branch
         await axios.put(
-          `http://localhost:8000/api/api/branches/${editingId}/`,
+          `${BASE_URL}/api/api/branches/${editingId}/`,
           formData
         );
       } else {
         // Add new branch
-        await axios.post("http://localhost:8000/api/api/branches/", formData);
+        await axios.post(`${BASE_URL}/api/api/branches/`, formData);
       }
       fetchBranches(); // Refresh the list
       setFormData({ name: "", location: "", manager: "" });
@@ -75,7 +76,7 @@ const BranchManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this branch?")) return;
     try {
-      await axios.delete(`http://localhost:8000/api/api/branches/${id}/`);
+      await axios.delete(`${BASE_URL}/api/api/branches/${id}/`);
       fetchBranches(); // Refresh after deletion
     } catch (error) {
       console.error("Error deleting branch:", error);

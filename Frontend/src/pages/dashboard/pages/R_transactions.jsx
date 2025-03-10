@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import CustomerModal from "./CustomerModel";
-
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const Transactions = () => {
@@ -93,10 +92,8 @@ const Transactions = () => {
             <tr key={transaction.id} className="border">
               <td className="border p-2">{transaction.id}</td>
               <td className="border p-2">
-                {
-                  branches.find((branch) => branch.id === transaction.branch)
-                    ?.name
-                }
+                {branches.find((branch) => branch.id === transaction.branch)
+                  ?.name || "Loading..."}
               </td>
               <td
                 className="border p-2 text-blue-500 cursor-pointer"
