@@ -29,9 +29,9 @@ class Branch(models.Model):
 class Customer(models.Model):
     name = models.CharField(max_length=255)
     father_name = models.CharField(max_length=255)
-    id_card = models.PositiveSmallIntegerField(max_length=50)
+    id_card = models.PositiveSmallIntegerField()
     biometric = models.BooleanField(default=True)
-    phone_number = PhoneNumberField(blank=True, null=True)
+    phone_number = models.IntegerField(blank=True, null=True, max_length=14)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -40,18 +40,26 @@ class Customer(models.Model):
         return f"{self.name} {self.father_name}"
 
 
-class Transactions(TimeStampedUUIDModel):
+class Transactions(models.Model):
+    User = get_user_model()
     STATUS_CHOICES = (
         ("Complete", "Complete"),
+        ("pending", "Pending"),
         ("Cancel", "Cancel"),
     )
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    current_branch = models.ForeignKey(
+        Branch, on_delete=models.CASCADE, related_name="current_brach"
+    )
+    to_branch = models.ForeignKey(
+        Branch, on_delete=models.CASCADE, related_name="to_brach"
+    )
     sender = models.ForeignKey(
         Customer, on_delete=models.PROTECT, related_name="sent_transactions"
     )
     receiver = models.ForeignKey(
         Customer, on_delete=models.PROTECT, related_name="received_transactions"
     )
+    agent = models.ForeignKey(User, on_delete=models.CASCADE)
     secret_key = models.PositiveIntegerField(unique=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2, default="0.00")
     fee = models.DecimalField(max_digits=12, decimal_places=2, default="0.00")
@@ -59,6 +67,9 @@ class Transactions(TimeStampedUUIDModel):
     status = models.CharField(
         max_length=255, choices=STATUS_CHOICES, blank=True, null=True
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
 

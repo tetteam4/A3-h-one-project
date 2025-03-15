@@ -8,13 +8,14 @@ import {
   FaChartBar,
   FaCog,
   FaSignOutAlt,
-  FaBars,
+  FaWallet,
 } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { signOutSuccess } from "../../state/userSlice/userSlice";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { Wallet } from "./pages/Wallet";
 
 const Sidebar = ({ setActiveComponent }) => {
   const [selectedC, setSelectedC] = useState("home");
@@ -43,6 +44,7 @@ const Sidebar = ({ setActiveComponent }) => {
 
   const Components = [
     { name: "Home", value: "home", icon: <FaTachometerAlt /> },
+    { name: "Wallet", value: "Wallet", icon: <FaWallet /> },
     {
       name: "Branch managements",
       value: "Branch managements",

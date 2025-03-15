@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios, { Axios } from "axios";
+import { useSelector } from "react-redux";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const S_Transaction = () => {
@@ -24,12 +25,12 @@ const S_Transaction = () => {
     },
     amount: "",
     commission: "",
-    amountToPay: "",
     agent: "",
+    current_branch: "",
+    to_branch: "",
   });
-
   const [modalType, setModalType] = useState(null);
-
+  const user = useSelector((state) => state.user.currentUser);
   const openModal = (type) => setModalType(type);
   const closeModal = () => {
     setModalType(null);
@@ -44,8 +45,7 @@ const S_Transaction = () => {
     if (
       section === "amount" ||
       section === "commission" ||
-      section === "amountToPay" ||
-      section === "agent"
+      section === "amountToPay"
     ) {
       setFormData((prev) => ({
         ...prev,
@@ -55,11 +55,17 @@ const S_Transaction = () => {
             ? prev.amount - prev.commission
             : prev.amountToPay,
       }));
-    } else if (section === "branch") {
+    } else if (section === "to_branch") {
       // Update branch separately
       setFormData((prev) => ({
         ...prev,
-        branch: value, // Set branch directly
+        to_branch: value, // Set branch directly
+      }));
+    } else if (section === "current_branch") {
+      // Update branch separately
+      setFormData((prev) => ({
+        ...prev,
+        current_branch: value, // Set branch directly
       }));
     } else {
       setFormData((prev) => ({
@@ -72,7 +78,7 @@ const S_Transaction = () => {
   const fetchBranches = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/api/branches/"
+        `${BASE_URL}/api/api/branches/`
       );
       setBranches(response.data);
     } catch (error) {
@@ -81,13 +87,17 @@ const S_Transaction = () => {
   };
   useEffect(() => {
     fetchBranches();
+    console.log(user);
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    let senderId = null;
+    let receiverId = null;
+
     try {
-      // Prepare sender data
+      // Prepare sender and receiver data
       const senderData = {
         name: formData.sender.name,
         father_name: formData.sender.fatherName,
@@ -96,7 +106,6 @@ const S_Transaction = () => {
         biometric: formData.sender.biometric || false,
       };
 
-      // Prepare receiver data
       const receiverData = {
         name: formData.receiver.name,
         father_name: formData.receiver.fatherName,
@@ -105,83 +114,97 @@ const S_Transaction = () => {
         biometric: formData.receiver.biometric || false,
       };
 
-      // Send sender data and get ID
-      const resSender = await axios.post(
-        `${BASE_URL}/api/api/customers/`,
-        senderData
-      );
-      const senderId = resSender.data.id; // Assuming API returns { id: ... }
-      console.log(resSender);
+      // Create sender and receiver concurrently
+      const [resSender, resReceiver] = await Promise.all([
+        axios.post(`${BASE_URL}/api/api/customers/`, senderData),
+        axios.post(`${BASE_URL}/api/api/customers/`, receiverData),
+      ]);
 
-      // Send receiver data and get ID
-      const resReceiver = await axios.post(
-        `${BASE_URL}/api/api/customers/`,
-        receiverData
-      );
-      const receiverId = resReceiver.data.id; // Assuming API returns { id: ... }
-      console.log(resReceiver);
+      senderId = resSender.data.id;
+      receiverId = resReceiver.data.id;
+      console.log(resSender, resReceiver);
 
       // Prepare transaction data
       const transactionData = {
-        branch: formData.branch,
+        current_branch: 1,
         sender: senderId,
         receiver: receiverId,
         amount: formData.amount || null,
         fee: formData.commission || null,
-        status: "Complete", // You can change this based on your logic
+        status: "pending",
+        agent: user.id || null,
+        to_branch: formData.to_branch,
       };
 
-      // Send transaction data to API
-      console.log(transactionData);
-
-      await axios.post(
-        `http://localhost:8000/api/api/transactions/`,
+      // Send transaction data
+      const transaction = await axios.post(
+        `${BASE_URL}/api/api/transactions/`,
         transactionData
       );
 
-      // Reset form data after successful submission
-      setFormData({
-        sender: {
-          name: "",
-          fatherName: "",
-          phoneNumber: "",
-          idNumber: "",
-          biometric: false,
-        },
-        receiver: {
-          name: "",
-          fatherName: "",
-          phoneNumber: "",
-          idNumber: "",
-          biometric: false,
-        },
-        amount: "",
-        commission: "",
-        amountToPay: "",
-        agent: "",
-      });
-
-      console.log("Transaction submitted successfully!");
+      if (transaction.status === 201) {
+        // Reset form on success
+        setFormData({
+          sender: {
+            name: "",
+            fatherName: "",
+            phoneNumber: "",
+            idNumber: "",
+            biometric: false,
+          },
+          receiver: {
+            name: "",
+            fatherName: "",
+            phoneNumber: "",
+            idNumber: "",
+            biometric: false,
+          },
+          amount: "",
+          commission: "",
+          amountToPay: "",
+          agent: "",
+        });
+        console.log("Transaction submitted successfully!", transaction);
+      } else {
+        throw new Error("Transaction creation failed.");
+      }
     } catch (error) {
       console.error("Error submitting data:", error);
+      alert("An error occurred. The operation has been cancelled.");
+
+      // Rollback sender if created
+      if (senderId) {
+        try {
+          await axios.delete(`${BASE_URL}/api/api/customers/${senderId}/`);
+          console.log("Sender data rolled back successfully.");
+        } catch (rollbackError) {
+          console.error("Failed to rollback sender data:", rollbackError);
+        }
+      }
+
+      // Rollback receiver if created
+      if (receiverId) {
+        try {
+          await axios.delete(`${BASE_URL}/api/api/customers/${receiverId}/`);
+          console.log("Receiver data rolled back successfully.");
+        } catch (rollbackError) {
+          console.error("Failed to rollback receiver data:", rollbackError);
+        }
+      }
     }
   };
 
   const handleResetModel = (modelType) => {
-    setFormData((prevData) => {
-      if (modelType === "sender") {
-        return {
-          ...prevData,
-          sender: { name: "", fatherName: "", phoneNumber: "" },
-        };
-      } else if (modelType === "receiver") {
-        return {
-          ...prevData,
-          receiver: { name: "", fatherName: "", idNumber: "", biometric: "" },
-        };
-      }
-      return prevData;
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      [modelType]: {
+        name: "",
+        fatherName: "",
+        phoneNumber: "",
+        idNumber: "",
+        biometric: false,
+      },
+    }));
   };
 
   return (
@@ -223,27 +246,18 @@ const S_Transaction = () => {
             required
           />
           <select
-            name="branch"
-            value={formData.branch || ""}
-            onChange={(e) => handleChange(e, "branch")}
+            name="to_branch"
+            value={formData.to_branch || ""}
+            onChange={(e) => handleChange(e, "to_branch")}
             className="border p-2 w-full"
           >
-            <option value="">Select Branch</option>
+            <option value="">Select to Branch</option>
             {branches.map((branch) => (
               <option key={branch.id} value={branch.id}>
                 {branch.name}
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            name="agent"
-            placeholder="Agent"
-            value={formData.agent}
-            onChange={(e) => handleChange(e, "agent")}
-            className="p-2 border rounded"
-            required
-          />
         </div>
         <button
           type="submit"
@@ -285,18 +299,26 @@ const S_Transaction = () => {
               onChange={(e) => handleChange(e, modalType)}
               className="p-2 border rounded w-full mb-2"
             />
-            <input
-              type="text"
-              name="biometric"
-              placeholder="Biometric Data"
-              value={formData[modalType].biometric}
-              onChange={(e) => handleChange(e, modalType)}
-              className="p-2 border rounded w-full mb-2"
-            />
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="biometric"
+                checked={formData[modalType].biometric}
+                onChange={(e) =>
+                  handleChange(
+                    { target: { name: "biometric", value: e.target.checked } },
+                    modalType
+                  )
+                }
+                className="p-2 border rounded mr-2"
+              />
+              Biometric Data
+            </label>
+
             <input
               type="text"
               name="phoneNumber"
-              placeholder="Phone Number"
+              placeholder="+93777889911"
               value={formData[modalType].phoneNumber}
               onChange={(e) => handleChange(e, modalType)}
               className="p-2 border rounded w-full mb-2"

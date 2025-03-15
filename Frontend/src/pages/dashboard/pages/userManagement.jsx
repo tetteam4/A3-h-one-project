@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -16,23 +17,25 @@ const UserManagement = () => {
     password: "",
     password_confirm: "",
   });
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editUserId, setEditUserId] = useState(null);
+  const roles = [
+    { id: 1, name: "Branch admin" },
+    { id: 2, name: "Agent" },
+  ];
   useEffect(() => {
     fetchUsers();
     fetchBranches();
   }, []);
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/auth/api/users/");
+      const response = await axios.get(`${BASE_URL}/auth/api/users/`);
       setUsers(response.data);
     } catch (error) {
       setError("Failed to fetch users");
@@ -43,9 +46,7 @@ const UserManagement = () => {
 
   const fetchBranches = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/api/branches/"
-      );
+      const response = await axios.get(`${BASE_URL}/api/api/branches/`);
       setBranches(response.data);
     } catch (error) {
       console.error("Error fetching branches:", error);
@@ -56,17 +57,57 @@ const UserManagement = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log(formData);
-
-      await axios.post("http://localhost:8000/auth/api/users/", formData);
-      alert("User registered successfully");
+      if (isEditMode) {
+        await axios.put(
+          `${BASE_URL}/auth/api/users/${editUserId}/`,
+          formData
+        );
+        alert("User updated successfully");
+      } else {
+        await axios.post(`${BASE_URL}/auth/api/users/`, formData);
+        alert("User registered successfully");
+      }
       fetchUsers();
+      resetForm();
     } catch (error) {
-      alert("Registration failed");
+      alert("Operation failed");
       console.log(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (user) => {
+    setFormData(user);
+    setIsEditMode(true);
+    setEditUserId(user.id);
+  };
+
+  const handleDelete = async (userId) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      try {
+        await axios.delete(`${BASE_URL}/auth/api/users/${userId}/`);
+        alert("User deleted successfully");
+        fetchUsers();
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      first_name: "",
+      last_name: "",
+      email: "",
+      role: null,
+      branch: null,
+      phone_number: "",
+      password: "",
+      password_confirm: "",
+    });
+    setIsEditMode(false);
+    setEditUserId(null);
   };
 
   return (
@@ -100,14 +141,20 @@ const UserManagement = () => {
           className="border p-2 w-full"
           required
         />
-        <input
-          type="number"
+        <select
           name="role"
-          placeholder="Role"
           value={formData.role || ""}
           onChange={handleChange}
           className="border p-2 w-full"
-        />
+          required
+        >
+          <option value="">Select Role</option>
+          {roles.map((role) => (
+            <option key={role.id} value={role.id}>
+              {role.name}
+            </option>
+          ))}
+        </select>
         <input
           type="text"
           name="phone_number"
@@ -150,36 +197,57 @@ const UserManagement = () => {
           required
         />
         <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-          Register
+          {isEditMode ? "Update User" : "Register User"}
         </button>
+        {isEditMode && (
+          <button
+            type="button"
+            onClick={resetForm}
+            className="bg-gray-500 text-white p-2 rounded ml-2"
+          >
+            Cancel
+          </button>
+        )}
       </form>
-
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
 
       <h3 className="text-lg font-bold mt-4">Registered Users</h3>
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100 border-b">
-            <th className="p-2 border">ID</th>
-            <th className="p-2 border">First Name</th>
-            <th className="p-2 border">Last Name</th>
-            <th className="p-2 border">Email</th>
-            <th className="p-2 border">Phone Number</th>
-            <th className="p-2 border">Branch</th>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Branch</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
             <tr key={user.id} className="border-b hover:bg-gray-50">
-              <td className="p-2 border text-center">{user.id}</td>
-              <td className="p-2 border">{user.first_name}</td>
-              <td className="p-2 border">{user.last_name}</td>
-              <td className="p-2 border">{user.email}</td>
-              <td className="p-2 border">{user.phone_number}</td>
-              <td className="p-2 border text-center">
+              <td>{user.id}</td>
+              <td>{user.first_name}</td>
+              <td>{user.last_name}</td>
+              <td>{user.email}</td>
+              <td>{user.phone_number}</td>
+              <td>
                 {branches.find((branch) => branch.id === user.branch)?.name ||
                   "N/A"}
+              </td>
+              <td>
+                <button
+                  onClick={() => handleEdit(user)}
+                  className="bg-yellow-500 text-white p-1 rounded mr-2"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(user.id)}
+                  className="bg-red-500 text-white p-1 rounded"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
