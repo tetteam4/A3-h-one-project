@@ -4,7 +4,6 @@ import PrivateRoute from "./components/common/PrivateRoute";
 import OnlyAdminPrivateRoute from "./components/common/OnlyAdmin";
 import ScrollTop from "./components/common/ScrollTop";
 import Signin from "./features/authentication/components/Signin";
-import Setting from "./pages/dashboard/pages/setting";
 export default function App() {
   return (
     <div>
