@@ -14,6 +14,7 @@ export default function App() {
           <Route path="/sign-in" element={<Signin />} />
           <Route path="*" element={<NotFound />} />
 
+          
           {/* private route for users*/}
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
